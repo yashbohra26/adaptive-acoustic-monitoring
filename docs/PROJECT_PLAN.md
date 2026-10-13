@@ -117,9 +117,14 @@ Executed single frozen evaluation on the 20 held-out test source groups (320 win
 
 Full outputs: [`results/phase5_final_evaluation.json`](../results/phase5_final_evaluation.json) and [`results/phase5_window_predictions.csv`](../results/phase5_window_predictions.csv).
 
-## Phase 6 — Wokwi ESP32 demonstration (Deferred)
+## Phase 6 — Wokwi ESP32 demonstration (Completed)
 
-Port a small deterministic version of the decision flow. Print the window, selected stage, and result to Serial. The demo is for firmware-flow illustration; it does not model microphone acoustics or validate physical timing/energy.
+Implemented a self-contained firmware demonstration of the frozen Candidate Selector v1.1 under `esp32_demo/`:
+- **Architecture:** Pure C++ core algorithm module ([`esp32_demo/src/adaptive_core.h`](../esp32_demo/src/adaptive_core.h)) implementing the exact Protocol v1.1.0 parameters and decision hierarchy, free of Arduino hardware dependencies.
+- **Wokwi Integration:** Complete PlatformIO configuration ([`esp32_demo/platformio.ini`](../esp32_demo/platformio.ini)), Wokwi configuration ([`esp32_demo/wokwi.toml`](../esp32_demo/wokwi.toml)), Wokwi board diagram ([`esp32_demo/diagram.json`](../esp32_demo/diagram.json)), and Arduino firmware sketch ([`esp32_demo/src/main.cpp`](../esp32_demo/src/main.cpp)).
+- **Deterministic Development Vectors:** 5 representative vectors exported strictly from development group `g0001` ([`esp32_demo/src/demo_vectors.h`](../esp32_demo/src/demo_vectors.h)) demonstrating both cheap Stage 1 early stops (clean normal, impact anomaly) and Stage 2 FFT escalations (frequency shift, high noise). Zero test data used.
+- **Verification:** 100% decision and stage parity between C++ and Python Protocol v1.1.0 verified via standalone desktop C++ test harness ([`esp32_demo/test_harness.cpp`](../esp32_demo/test_harness.cpp)) and automated Python test suite.
+- **Physical Reality Disclaimer:** This is an emulation/simulation demonstrating control flow on pre-buffered synthetic signals. It does not measure physical ESP32 power, battery life, analog transducer noise, or real-world industrial acoustic environments.
 
 ## Phase 7 — Report and presentation (Deferred)
 

@@ -81,7 +81,19 @@ adaptive-acoustic-monitoring/
 │   ├── run_phase3_pilot.py
 │   ├── run_phase4_review.py
 │   ├── run_phase4_study.py
-│   └── run_phase5_evaluation.py
+│   ├── run_phase5_evaluation.py
+│   └── export_demo_vectors.py
+├── esp32_demo/
+│   ├── platformio.ini
+│   ├── wokwi.toml
+│   ├── diagram.json
+│   ├── test_harness.cpp
+│   ├── demo_vectors_metadata.json
+│   ├── README.md
+│   └── src/
+│       ├── main.cpp
+│       ├── adaptive_core.h
+│       └── demo_vectors.h
 ├── results/
 │   ├── preview/
 │   ├── phase2_pilot/
@@ -101,7 +113,8 @@ adaptive-acoustic-monitoring/
 │   ├── test_phase4.py
 │   ├── test_phase4_cv.py
 │   ├── test_phase4_investigation.py
-│   └── test_phase5.py
+│   ├── test_phase5.py
+│   └── test_phase6_wokwi.py
 └── docs/
     ├── PROJECT_PLAN.md
     ├── EXPERIMENT_SPEC.md
@@ -110,4 +123,4 @@ adaptive-acoustic-monitoring/
     └── AI_HANDOFF.md
 ```
 
-Later phases will add method implementations, experiment outputs, and an `esp32_demo/` folder. Do not treat future folders as already implemented.
+Phase 6 (`esp32_demo/`) provides a software-only firmware demonstration of Candidate Selector v1.1 for Wokwi. Phase 7 (research report) remains deferred.

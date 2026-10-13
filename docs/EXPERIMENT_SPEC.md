@@ -59,6 +59,7 @@ Frequency-estimation ground truth is meaningful only for stable single-tone norm
 - **Protocol Freeze:** Historical v1.0 specified and frozen in [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and [`results/evaluation_protocol.json`](../results/evaluation_protocol.json). Active Protocol v1.1.0 frozen in [`results/evaluation_protocol_v1.1.json`](../results/evaluation_protocol_v1.1.json).
 - **Candidate Selector v1.1 Investigation:** Fully analyzed in [`docs/PHASE4_INVESTIGATION.md`](PHASE4_INVESTIGATION.md) and evaluated via 5-fold CV (`cand_v1.1_p60_anomaly_first` in `python/candidate_selector.py`).
 - **Phase 5 Held-Out Evaluation:** Completed on the 20 held-out test source groups (320 windows). Fixed-High F1 0.9492 (29,250 ops); Candidate v1.1 F1 0.9170, Recall 0.8750, FAR 0.1000, 26,992.3 ops/window (+7.72% operational savings). Documented in [`results/phase5_final_evaluation.json`](../results/phase5_final_evaluation.json).
+- **Phase 6 Embedded Demonstration:** Implemented under `esp32_demo/` for Wokwi ESP32 emulation, porting the frozen Protocol v1.1.0 decision hierarchy. Verified 100% decision and stage parity on 5 deterministic development vectors from Group `g0001` ([`esp32_demo/README.md`](../esp32_demo/README.md)).
 
 ### Shared requirements
 

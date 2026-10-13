@@ -1,0 +1,101 @@
+{
+  "generator_source": "python/export_demo_vectors.py",
+  "seed": 20261013,
+  "vectors": [
+    {
+      "name": "demo_clean_normal",
+      "source_group_id": "g0001",
+      "split": "development",
+      "dev_subset": "fit",
+      "case": "normal",
+      "snr_db": 30.0,
+      "description": "Clean normal signal stopped cheaply at Stage 1 as confident normal",
+      "target_frequency_hz": 218.14027699816538,
+      "python_expected": {
+        "low_stage_score": 1.1873954015854442,
+        "frequency_estimate_hz": 216.796875,
+        "stage_reached": "stage1_low",
+        "fft_used": false,
+        "escalation_reason": "confident_normal",
+        "predicted_label": 0,
+        "op_count_proxy": 10265
+      }
+    },
+    {
+      "name": "demo_impact",
+      "source_group_id": "g0001",
+      "split": "development",
+      "dev_subset": "fit",
+      "case": "impact",
+      "snr_db": 20.0,
+      "description": "High-crest impact anomaly stopped cheaply at Stage 1 as confident anomaly",
+      "target_frequency_hz": "",
+      "python_expected": {
+        "low_stage_score": 32.58310832348767,
+        "frequency_estimate_hz": 955.078125,
+        "stage_reached": "stage1_low",
+        "fft_used": false,
+        "escalation_reason": "confident_anomaly",
+        "predicted_label": 1,
+        "op_count_proxy": 10265
+      }
+    },
+    {
+      "name": "demo_frequency_shift",
+      "source_group_id": "g0001",
+      "split": "development",
+      "dev_subset": "fit",
+      "case": "frequency_shift",
+      "snr_db": 20.0,
+      "description": "Frequency shift detected via ZCF out-of-range, escalated to FFT",
+      "target_frequency_hz": 328.80093981391144,
+      "python_expected": {
+        "low_stage_score": 1.3598740253192585,
+        "frequency_estimate_hz": 328.125,
+        "stage_reached": "stage2_high",
+        "fft_used": true,
+        "escalation_reason": "zcf_out_of_range",
+        "predicted_label": 1,
+        "op_count_proxy": 39515
+      }
+    },
+    {
+      "name": "demo_added_harmonic",
+      "source_group_id": "g0001",
+      "split": "development",
+      "dev_subset": "fit",
+      "case": "added_harmonic",
+      "snr_db": 30.0,
+      "description": "Subtle harmonic demonstrating frozen policy trade-off (Stage 1 miss)",
+      "target_frequency_hz": "",
+      "python_expected": {
+        "low_stage_score": 1.7184945746293765,
+        "frequency_estimate_hz": 218.75,
+        "stage_reached": "stage1_low",
+        "fft_used": false,
+        "escalation_reason": "confident_normal",
+        "predicted_label": 0,
+        "op_count_proxy": 10265
+      }
+    },
+    {
+      "name": "demo_noisy_normal",
+      "source_group_id": "g0001",
+      "split": "development",
+      "dev_subset": "fit",
+      "case": "normal",
+      "snr_db": 0.0,
+      "description": "High-noise normal escalated to FFT; Fixed-High avoids false alarm",
+      "target_frequency_hz": 218.14027699816538,
+      "python_expected": {
+        "low_stage_score": 5.110270834015725,
+        "frequency_estimate_hz": 218.75,
+        "stage_reached": "stage2_high",
+        "fft_used": true,
+        "escalation_reason": "zcf_out_of_range",
+        "predicted_label": 0,
+        "op_count_proxy": 39515
+      }
+    }
+  ]
+}
