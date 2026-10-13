@@ -56,7 +56,8 @@ Frequency-estimation ground truth is meaningful only for stable single-tone norm
     - Adaptive weighted mean: \((N_{\text{stage1}} \times 10,265 + N_{\text{stage2}} \times 39,515) / N_{\text{total}}\).
     - For development pilot: \((606 \times 10,265 + 354 \times 39,515) / 960 = 21,050.9\) ops/window (\(-28.0\%\) relative to standalone Fixed-High).
   - Desktop execution time in milliseconds recorded separately from operation counts. Neither represents physical hardware energy.
-- **Protocol Freeze:** Fully specified and frozen in [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and [`results/evaluation_protocol.json`](../results/evaluation_protocol.json).
+- **Protocol Freeze:** Historical v1.0 specified and frozen in [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and [`results/evaluation_protocol.json`](../results/evaluation_protocol.json).
+- **Candidate Selector v1.1 Investigation:** Fully analyzed in [`docs/PHASE4_INVESTIGATION.md`](PHASE4_INVESTIGATION.md) and evaluated via 5-fold CV (`cand_v1.1_p60_anomaly_first` in `python/candidate_selector.py`), demonstrating F1 0.9544, Recall 0.9292, FAR 0.0542, and +3.55% savings over Fixed-High.
 
 ### Shared requirements
 

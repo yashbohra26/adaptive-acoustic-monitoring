@@ -81,18 +81,25 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 
 **Acceptance checks:** report detection/frequency quality together with escalation share. Confident cases stop cheaply at stage 1; impacts and out-of-range frequencies escalate reliably; work and runtime recorded separately. Fitted boundaries recorded in `results/phase3_pilot/adaptive_diagnostics.json`.
 
-## Phase 4 — Pilot review and protocol freeze (Done)
+## Phase 4 — Pilot review, protocol freeze, and candidate feature investigation (Done)
 
 **Completed:**
 
 - Audited operation-count proxy arithmetic: resolved cumulative vs additional stage accounting.
   - Stage 1: \(10,265\) ops; Stage 2 additional: \(29,250\) ops; Escalated window cumulative: \(39,515\) ops.
   - Exact weighted mean verified: \((606 \times 10,265 + 354 \times 39,515) / 960 = 21,050.9375\) ops/window (\(-28.0\%\) vs Fixed-High).
-- Development diagnostic comparison evaluated Fixed-Low, Fixed-High, and Adaptive processing across 960 development windows (with group-level bootstrap 95% CIs) without touching held-out test data.
-- Protocol frozen in versioned human-readable document [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and machine-readable specification [`results/evaluation_protocol.json`](../results/evaluation_protocol.json).
+- Initial protocol frozen in versioned human-readable document [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and machine-readable specification [`results/evaluation_protocol.json`](../results/evaluation_protocol.json).
 - Test split protected with strict programmatic guard and hash verification (`b99e0b36ea5b6659`).
+- **Feature Investigation & Identifiability Audit (`docs/PHASE4_INVESTIGATION.md`):**
+  - Audited inference-time inputs: verified no leakage of machine identity, nominal \(f_0\), or SNR.
+  - Proved theoretical break-even cascade escalation limit: \(E_{\max} = (29,250 - 10,265) / 29,250 = 64.91\%\).
+  - Evaluated candidate lightweight features (normalized difference ratio \(R_{\text{diff}}\), ZCF bounds) and analyzed noise smearing at 0 dB SNR.
+  - Developed and verified Candidate Selector v1.1 (`cand_v1.1_p60_anomaly_first` in `python/candidate_selector.py`):
+    - Re-architected cascade order: confident anomaly checked *before* frequency discrepancy, eliminating unnecessary FFT escalation on impacts (0.0% escalation).
+    - Achieved **F1 0.9544** (matches Fixed-High), **Recall 0.9292** (matches Fixed-High), **FAR 0.0542** (matches Fixed-High), **Average Ops 28,211.1** ops/window (**+3.55% positive savings**).
+  - Preserved v1.0 frozen protocol as historical baseline while preparing candidate v1.1 for user review.
 
-**Acceptance checks:** all Phase 1–4 tests pass; operation-cost arithmetic is consistent; held-out test data remains uninspected and protected from evaluation.
+**Acceptance checks:** all 28 Phase 1–4 tests pass; operation-cost arithmetic is consistent; held-out test data remains uninspected and protected from evaluation.
 
 ## Phase 5 — Full evaluation
 

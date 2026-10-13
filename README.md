@@ -73,8 +73,10 @@ adaptive-acoustic-monitoring/
 │   ├── config.py
 │   ├── generate_signals.py
 │   ├── features.py
+│   ├── candidate_features.py
 │   ├── baselines.py
 │   ├── adaptive_selector.py
+│   ├── candidate_selector.py
 │   ├── run_phase2_pilot.py
 │   ├── run_phase3_pilot.py
 │   ├── run_phase4_review.py
@@ -85,17 +87,21 @@ adaptive-acoustic-monitoring/
 │   ├── phase3_pilot/
 │   ├── phase4_review/
 │   ├── phase4_study/
+│   │   ├── identifiability_audit.json
+│   │   └── selector_study_results.json
 │   └── evaluation_protocol.json
 ├── tests/
 │   ├── test_phase1.py
 │   ├── test_phase2.py
 │   ├── test_phase3.py
 │   ├── test_phase4.py
-│   └── test_phase4_cv.py
+│   ├── test_phase4_cv.py
+│   └── test_phase4_investigation.py
 └── docs/
     ├── PROJECT_PLAN.md
     ├── EXPERIMENT_SPEC.md
     ├── EVALUATION_PROTOCOL.md
+    ├── PHASE4_INVESTIGATION.md
     └── AI_HANDOFF.md
 ```
 

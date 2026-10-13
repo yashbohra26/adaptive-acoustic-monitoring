@@ -1,0 +1,419 @@
+{
+  "audit_scope": "DEVELOPMENT_SET_ONLY (960 windows across 60 groups)",
+  "inference_time_inputs_available": {
+    "window_samples_x": true,
+    "sample_rate_hz": true,
+    "reference_fit_parameters": true,
+    "threshold_calibration_boundaries": true,
+    "source_group_id": false,
+    "nominal_normal_frequency_hz": false,
+    "snr_db": false,
+    "ground_truth_case": false
+  },
+  "cascade_cost_accounting": {
+    "stage1_ops": 10265,
+    "stage2_added_ops": 29250,
+    "escalated_total_ops": 39515,
+    "standalone_fixed_high_ops": 29250,
+    "break_even_escalation_rate": 0.6490598290598291,
+    "break_even_formula": "E_max = (C_high - C_stage1) / C_high = (29250 - 10265) / 29250 = 64.91%",
+    "impact_of_adding_difference_ratio_feature_to_stage1": {
+      "diff_ratio_ops": 7169,
+      "new_stage1_ops": 17434,
+      "new_break_even_escalation_rate": 0.40396581196581194,
+      "conclusion": "Adding candidate feature to Stage 1 reduces allowable escalation from 64.91% to 40.40%, hurting efficiency."
+    }
+  },
+  "identifiability_findings": {
+    "impact": "100% identifiable in Stage 1 via kurtosis (min 10.56 vs normal max 2.90) and crest factor. Never needs FFT escalation.",
+    "frequency_shift": "Clean fundamental range (264-405 Hz) cleanly separated from normal fundamental (180-260 Hz) at high SNRs. Noise smears ZCF at 0 dB to >500 Hz for both classes.",
+    "added_harmonic": "Identical fundamental to normal (180-260 Hz). Kurtosis separated at >=10 dB (~1.92 vs ~1.50) but overlaps at 0 dB due to Gaussian noise kurtosis ~3.0. Escalation required for robust classification.",
+    "normal": "Clean fundamental bounded in [180, 260] Hz. White noise causes high ZCF (>500 Hz) at 0 dB, requiring escalation to avoid false alarms."
+  },
+  "feature_statistics": {
+    "normal_30dB": {
+      "case": "normal",
+      "snr_db": 30.0,
+      "zcf_hz": {
+        "min": 183.59375,
+        "median": 218.75,
+        "max": 259.765625
+      },
+      "kurtosis": {
+        "min": 1.4966340917692844,
+        "median": 1.5028194367128573,
+        "max": 1.508435645625812
+      },
+      "crest_factor": {
+        "min": 1.4655621013724727,
+        "median": 1.486340980248203,
+        "max": 1.5149889131831882
+      },
+      "diff_ratio": {
+        "min": 0.08387107021822184,
+        "median": 0.11890138581652987,
+        "max": 0.1660898407188823
+      }
+    },
+    "normal_20dB": {
+      "case": "normal",
+      "snr_db": 20.0,
+      "zcf_hz": {
+        "min": 183.59375,
+        "median": 218.75,
+        "max": 259.765625
+      },
+      "kurtosis": {
+        "min": 1.5176807496325253,
+        "median": 1.5300912409634364,
+        "max": 1.5466621328016679
+      },
+      "crest_factor": {
+        "min": 1.5864392506078364,
+        "median": 1.659712445914772,
+        "max": 1.7397640277855564
+      },
+      "diff_ratio": {
+        "min": 0.10069147996507172,
+        "median": 0.13616016288315266,
+        "max": 0.18189999963168896
+      }
+    },
+    "normal_10dB": {
+      "case": "normal",
+      "snr_db": 10.0,
+      "zcf_hz": {
+        "min": 212.890625,
+        "median": 253.90625,
+        "max": 292.96875
+      },
+      "kurtosis": {
+        "min": 1.6781228827179073,
+        "median": 1.7580213662828283,
+        "max": 1.8357367118222714
+      },
+      "crest_factor": {
+        "min": 2.015191334550576,
+        "median": 2.166687693753401,
+        "max": 2.5069213646840067
+      },
+      "diff_ratio": {
+        "min": 0.24365016375984686,
+        "median": 0.2897003535782532,
+        "max": 0.33888700779586145
+      }
+    },
+    "normal_0dB": {
+      "case": "normal",
+      "snr_db": 0.0,
+      "zcf_hz": {
+        "min": 537.109375,
+        "median": 615.234375,
+        "max": 658.203125
+      },
+      "kurtosis": {
+        "min": 2.436754949611519,
+        "median": 2.593049023095146,
+        "max": 2.897472626987213
+      },
+      "crest_factor": {
+        "min": 2.6233608386116365,
+        "median": 3.0000947816296186,
+        "max": 3.6354223403283936
+      },
+      "diff_ratio": {
+        "min": 0.9816307167321529,
+        "median": 1.0594205309728464,
+        "max": 1.137552533476341
+      }
+    },
+    "frequency_shift_30dB": {
+      "case": "frequency_shift",
+      "snr_db": 30.0,
+      "zcf_hz": {
+        "min": 265.625,
+        "median": 328.125,
+        "max": 404.296875
+      },
+      "kurtosis": {
+        "min": 1.4997582344396985,
+        "median": 1.5038355898064832,
+        "max": 1.5097138085739585
+      },
+      "crest_factor": {
+        "min": 1.4643188475579776,
+        "median": 1.489321669345484,
+        "max": 1.5135829264054512
+      },
+      "diff_ratio": {
+        "min": 0.17181696195341697,
+        "median": 0.2613693550023227,
+        "max": 0.3917926207855464
+      }
+    },
+    "frequency_shift_20dB": {
+      "case": "frequency_shift",
+      "snr_db": 20.0,
+      "zcf_hz": {
+        "min": 263.671875,
+        "median": 328.125,
+        "max": 404.296875
+      },
+      "kurtosis": {
+        "min": 1.517445103536927,
+        "median": 1.5292067523193127,
+        "max": 1.5425696314627961
+      },
+      "crest_factor": {
+        "min": 1.6112890400184008,
+        "median": 1.6591788641260354,
+        "max": 1.794615804446739
+      },
+      "diff_ratio": {
+        "min": 0.1880297884266751,
+        "median": 0.2774581198374326,
+        "max": 0.40588628729730625
+      }
+    },
+    "frequency_shift_10dB": {
+      "case": "frequency_shift",
+      "snr_db": 10.0,
+      "zcf_hz": {
+        "min": 279.296875,
+        "median": 341.796875,
+        "max": 404.296875
+      },
+      "kurtosis": {
+        "min": 1.713159429891925,
+        "median": 1.7621875552500217,
+        "max": 1.8076664662036044
+      },
+      "crest_factor": {
+        "min": 1.985803699824735,
+        "median": 2.193105175832134,
+        "max": 2.66631129482023
+      },
+      "diff_ratio": {
+        "min": 0.33005617294093476,
+        "median": 0.4201494793930945,
+        "max": 0.5355092930759577
+      }
+    },
+    "frequency_shift_0dB": {
+      "case": "frequency_shift",
+      "snr_db": 0.0,
+      "zcf_hz": {
+        "min": 566.40625,
+        "median": 644.53125,
+        "max": 703.125
+      },
+      "kurtosis": {
+        "min": 2.3989440851847337,
+        "median": 2.613060864814768,
+        "max": 2.8849882031599474
+      },
+      "crest_factor": {
+        "min": 2.6977265231023138,
+        "median": 3.047171288110434,
+        "max": 3.8529740748773467
+      },
+      "diff_ratio": {
+        "min": 0.9970317298007152,
+        "median": 1.1289167184754825,
+        "max": 1.2585947397674697
+      }
+    },
+    "added_harmonic_30dB": {
+      "case": "added_harmonic",
+      "snr_db": 30.0,
+      "zcf_hz": {
+        "min": 183.59375,
+        "median": 219.7265625,
+        "max": 259.765625
+      },
+      "kurtosis": {
+        "min": 1.902749720455061,
+        "median": 1.916832140086338,
+        "max": 1.9361905658650405
+      },
+      "crest_factor": {
+        "min": 1.6893583668780345,
+        "median": 1.8912058002854315,
+        "max": 1.9357671410801356
+      },
+      "diff_ratio": {
+        "min": 0.12367014617904637,
+        "median": 0.17651335562185497,
+        "max": 0.24372775776045566
+      }
+    },
+    "added_harmonic_20dB": {
+      "case": "added_harmonic",
+      "snr_db": 20.0,
+      "zcf_hz": {
+        "min": 183.59375,
+        "median": 225.5859375,
+        "max": 289.0625
+      },
+      "kurtosis": {
+        "min": 1.9157296820094665,
+        "median": 1.9383898895479454,
+        "max": 1.96409334768632
+      },
+      "crest_factor": {
+        "min": 1.8220021750645399,
+        "median": 2.0281582354906504,
+        "max": 2.218406084064323
+      },
+      "diff_ratio": {
+        "min": 0.13973426322137578,
+        "median": 0.19228358581650573,
+        "max": 0.2563639764840214
+      }
+    },
+    "added_harmonic_10dB": {
+      "case": "added_harmonic",
+      "snr_db": 10.0,
+      "zcf_hz": {
+        "min": 212.890625,
+        "median": 264.6484375,
+        "max": 378.90625
+      },
+      "kurtosis": {
+        "min": 2.0156813315807476,
+        "median": 2.099657475165776,
+        "max": 2.1769104048787926
+      },
+      "crest_factor": {
+        "min": 2.217436534597018,
+        "median": 2.4200979379210743,
+        "max": 2.75666470587873
+      },
+      "diff_ratio": {
+        "min": 0.29778219659241095,
+        "median": 0.34085939080901495,
+        "max": 0.4088266545098408
+      }
+    },
+    "added_harmonic_0dB": {
+      "case": "added_harmonic",
+      "snr_db": 0.0,
+      "zcf_hz": {
+        "min": 591.796875,
+        "median": 660.15625,
+        "max": 710.9375
+      },
+      "kurtosis": {
+        "min": 2.512426069879663,
+        "median": 2.7352553382191727,
+        "max": 3.05705072342852
+      },
+      "crest_factor": {
+        "min": 2.744449172593073,
+        "median": 3.1335560975069146,
+        "max": 3.9174840363988994
+      },
+      "diff_ratio": {
+        "min": 0.971459915869653,
+        "median": 1.092143114973583,
+        "max": 1.1851448010778827
+      }
+    },
+    "impact_30dB": {
+      "case": "impact",
+      "snr_db": 30.0,
+      "zcf_hz": {
+        "min": 804.6875,
+        "median": 904.296875,
+        "max": 968.75
+      },
+      "kurtosis": {
+        "min": 41.997176679383706,
+        "median": 42.481393146513284,
+        "max": 43.464166227652434
+      },
+      "crest_factor": {
+        "min": 8.827235960156534,
+        "median": 9.880229372639933,
+        "max": 10.33493949571987
+      },
+      "diff_ratio": {
+        "min": 0.6398692540375571,
+        "median": 1.0941547379346233,
+        "max": 1.5446742283903874
+      }
+    },
+    "impact_20dB": {
+      "case": "impact",
+      "snr_db": 20.0,
+      "zcf_hz": {
+        "min": 863.28125,
+        "median": 953.125,
+        "max": 1027.34375
+      },
+      "kurtosis": {
+        "min": 40.78815017532482,
+        "median": 41.771382289514214,
+        "max": 42.97932110303322
+      },
+      "crest_factor": {
+        "min": 8.700515814400852,
+        "median": 9.876459921409458,
+        "max": 10.261142056437047
+      },
+      "diff_ratio": {
+        "min": 0.6519161200714467,
+        "median": 1.1042390205322328,
+        "max": 1.549614702570782
+      }
+    },
+    "impact_10dB": {
+      "case": "impact",
+      "snr_db": 10.0,
+      "zcf_hz": {
+        "min": 912.109375,
+        "median": 978.515625,
+        "max": 1007.8125
+      },
+      "kurtosis": {
+        "min": 33.313281583197174,
+        "median": 35.51333532856891,
+        "max": 37.537599983920806
+      },
+      "crest_factor": {
+        "min": 8.32480062264395,
+        "median": 9.44025826127414,
+        "max": 10.275498215046731
+      },
+      "diff_ratio": {
+        "min": 0.7520520703263515,
+        "median": 1.1832491740095736,
+        "max": 1.5901230674626194
+      }
+    },
+    "impact_0dB": {
+      "case": "impact",
+      "snr_db": 0.0,
+      "zcf_hz": {
+        "min": 929.6875,
+        "median": 983.3984375,
+        "max": 1029.296875
+      },
+      "kurtosis": {
+        "min": 10.56334873129781,
+        "median": 12.835176945654688,
+        "max": 15.543440295678359
+      },
+      "crest_factor": {
+        "min": 6.096506343137485,
+        "median": 7.497837175539506,
+        "max": 8.428800210792803
+      },
+      "diff_ratio": {
+        "min": 1.3209739020140299,
+        "median": 1.5493880791136774,
+        "max": 1.7469894032366147
+      }
+    }
+  }
+}
