@@ -80,7 +80,8 @@ adaptive-acoustic-monitoring/
 │   ├── run_phase2_pilot.py
 │   ├── run_phase3_pilot.py
 │   ├── run_phase4_review.py
-│   └── run_phase4_study.py
+│   ├── run_phase4_study.py
+│   └── run_phase5_evaluation.py
 ├── results/
 │   ├── preview/
 │   ├── phase2_pilot/
@@ -89,14 +90,18 @@ adaptive-acoustic-monitoring/
 │   ├── phase4_study/
 │   │   ├── identifiability_audit.json
 │   │   └── selector_study_results.json
-│   └── evaluation_protocol.json
+│   ├── evaluation_protocol.json
+│   ├── evaluation_protocol_v1.1.json
+│   ├── phase5_final_evaluation.json
+│   └── phase5_window_predictions.csv
 ├── tests/
 │   ├── test_phase1.py
 │   ├── test_phase2.py
 │   ├── test_phase3.py
 │   ├── test_phase4.py
 │   ├── test_phase4_cv.py
-│   └── test_phase4_investigation.py
+│   ├── test_phase4_investigation.py
+│   └── test_phase5.py
 └── docs/
     ├── PROJECT_PLAN.md
     ├── EXPERIMENT_SPEC.md

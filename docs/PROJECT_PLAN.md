@@ -101,27 +101,29 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 
 **Acceptance checks:** all 28 Phase 1–4 tests pass; operation-cost arithmetic is consistent; held-out test data remains uninspected and protected from evaluation.
 
-## Phase 5 — Full evaluation
+## Phase 5 — Full evaluation (Completed)
 
-Run every method on the exact same held-out signal windows. Produce:
+Executed single frozen evaluation on the 20 held-out test source groups (320 windows, SHA-256: `b99e0b36ea5b6659`) under Protocol v1.1.0 (`results/evaluation_protocol_v1.1.json`).
 
-- Precision, recall, F1, and false-alarm rate
-- Frequency error on valid target cases
-- Python runtime per window, reported separately
-- Documented operation-count proxy, reported separately
-- Adaptive escalation/stage distribution
-- Performance versus noise level
-- Sensitivity analysis for adaptive thresholds
+**Final Held-Out Results Summary (with group-level bootstrap 95% CIs):**
+- **Fixed-Low Standalone:** F1 = `0.5572` (`[0.5313, 0.5788]`), Recall = `0.3958` (`[0.3750, 0.4167]`), FAR = `0.0750` (`[0.0250, 0.1375]`), Freq MAE = `91.44` Hz, Ops = `10,265.0`.
+- **Fixed-High Standalone:** F1 = `0.9492` (`[0.9123, 0.9772]`), Recall = `0.9333` (`[0.8667, 0.9833]`), FAR = `0.1000` (`[0.0500, 0.1500]`), Freq MAE = `0.85` Hz, Ops = `29,250.0`.
+- **Adaptive Selector v1.0 (Historical):** F1 = `0.6243` (`[0.6023, 0.6431]`), Recall = `0.4708` (`[0.4458, 0.4917]`), FAR = `0.1125` (`[0.0625, 0.1625]`), Freq MAE = `38.37` Hz, Escalation = `38.12%`, Ops = `21,416.6` (+26.78% savings, but misses 53% of anomalies).
+- **Candidate Adaptive Selector v1.1:** F1 = `0.9170` (`[0.8662, 0.9575]`), Recall = `0.8750` (`[0.7957, 0.9458]`), FAR = `0.1000` (`[0.0500, 0.1500]`), Freq MAE = `2.75` Hz, Escalation = `57.19%`, Average Ops = `26,992.3` (`[25,347.0, 28,363.4]`), **+7.72% operational savings**.
+  - Matches Fixed-High False-Alarm Rate exactly (0.1000 vs 0.1000).
+  - 100% recall on impacts with 0.0% escalation (decided at Stage 1).
+  - Matches Fixed-High on frequency shifts (80.00% recall).
+  - Misses 14 quiet added-harmonic windows at high SNR that score below Stage 1 normal threshold.
 
-Do not describe operation counts or desktop runtime as measured ESP32 energy savings.
+Full outputs: [`results/phase5_final_evaluation.json`](../results/phase5_final_evaluation.json) and [`results/phase5_window_predictions.csv`](../results/phase5_window_predictions.csv).
 
-## Phase 6 — Wokwi ESP32 demonstration
+## Phase 6 — Wokwi ESP32 demonstration (Deferred)
 
 Port a small deterministic version of the decision flow. Print the window, selected stage, and result to Serial. The demo is for firmware-flow illustration; it does not model microphone acoustics or validate physical timing/energy.
 
-## Phase 7 — Report and presentation (deferred)
+## Phase 7 — Report and presentation (Deferred)
 
-Only after implementation results are ready, write the methods, results, limitations, and conclusion. Do not invent favorable outcomes: include cases where the adaptive approach loses or fails.
+Deferred until explicitly requested by user. Do not invent favorable outcomes: include cases where the adaptive approach loses or fails.
 
 ## Team workflow with Antigravity
 
