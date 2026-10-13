@@ -1,10 +1,10 @@
-# Frozen Evaluation Protocol (v1.0.0)
+# Evaluation Protocol (v1.0.0 & v1.1 Candidate Review)
 
-> **Status:** FROZEN  
-> **Protocol Version:** 1.0.0  
-> **Date Frozen:** 2026-10-14  
-> **Commit Hash:** Frozen in Phase 4 commit (see repository log)  
-> **Machine-Readable Spec:** [`results/evaluation_protocol.json`](../results/evaluation_protocol.json)
+> **Status:** PHASE 4 REOPENED — DEVELOPMENT REVIEW IN PROGRESS (HELD-OUT TEST SPLIT REMAINS LOCKED)  
+> **Initial Freeze Version:** 1.0.0 (commit `0dc2b39`)  
+> **Review Study Status:** Grouped 5-Fold Cross-Validation Candidate Review Completed (v1.1 Candidate Identified)  
+> **Current Version:** 1.0.0 (baseline) / v1.1 (candidate under team review)  
+> **Machine-Readable Specs:** [`results/evaluation_protocol.json`](../results/evaluation_protocol.json), [`results/phase4_study/selector_study_results.json`](../results/phase4_study/selector_study_results.json)
 
 ---
 
@@ -103,3 +103,37 @@ Operation counts represent algorithmic operations and selector overhead (not phy
 Because signal windows sharing the same source `group_id` are correlated across SNRs and cases:
 - Group-level bootstrap resampling (1,000 iterations) will be performed by resampling source groups with replacement to construct 95% confidence intervals.
 - The 20 held-out test groups represent a finite cluster sample; limitations of sample clustering will be documented alongside test metrics.
+
+---
+
+## 4. Development-Only Selector Review and v1.1 Candidate Analysis
+
+### 4.1 Failure Mode Diagnosis in v1.0
+In v1.0, the zero-crossing frequency bounds \([f_{\text{zcf}, 1\%}, f_{\text{zcf}, 99\%}] = [183.96, 644.63]\) Hz were calibrated across all SNRs (including 0 dB SNR). Because additive noise at 0 dB causes frequent random sign changes, the normal calibration distribution shifted up to 658 Hz, creating a wide acceptance window. Consequently, `frequency_shift` windows (normal fundamentals shifted by \(1.35\times\) to \(1.60\times\), placing them between 260 and 416 Hz) and `added_harmonic` windows fell directly inside the normal ZCF acceptance window, while their time-domain log features scored below \(\tau_{90}\), causing them to stop at Stage 1 as False Negatives.
+
+### 4.2 Grouped 5-Fold Cross-Validation Study
+Using only the 60 development source groups (5 folds of 12 validation groups each; 24 fit groups and 24 calibration groups per fold):
+- **Out-of-Fold Baselines:**
+  - Fixed-Low: \(\text{F1} = 0.5700\), \(\text{Recall} = 0.4069\), \(\text{FAR} = 0.0625\), \(\text{Ops} = 10,265\).
+  - Fixed-High: \(\text{F1} = 0.9544\), \(\text{Recall} = 0.9292\), \(\text{FAR} = 0.0542\), \(\text{Ops} = 29,250\).
+- **Predeclared Quality Constraints relative to Out-of-Fold Fixed-High:**
+  - \(\text{F1} \ge 0.9044\) (\(\ge \text{High} - 0.05\))
+  - \(\text{Recall} \ge 0.8792\) (\(\ge \text{High} - 0.05\))
+  - \(\text{FAR} \le 0.0642\) (\(\le \text{High} + 0.01\))
+
+### 4.3 Candidate Search Results
+Across 12 evaluated policies:
+1. **Low-escalation policies (v1.0 baseline, clean ZCF with \(\tau_{90}\)):**
+   Achieved 28% operation savings, but failed the recall constraint (\(\text{F1} \in [0.62, 0.84]\), \(\text{Recall} \in [0.46, 0.74]\)) because subtle harmonic variations are indistinguishable from normal signals using only 3 time-domain features.
+2. **High-recall policies (v1.1 Candidate: `cand_p60_clean_margin`):**
+   - Clean ZCF bounds: \([173.6, 269.8]\) Hz (\(\pm 10\) Hz margin over clean normal range).
+   - Low-score confident-normal threshold: 60th percentile of normal calibration scores.
+   - **Performance:** \(\text{F1} = 0.9544\), \(\text{Recall} = 0.9292\), \(\text{FAR} = 0.0542\) (satisfies all 3 quality constraints).
+   - **Cost:** Escalation rate \(86.46\%\), average operation proxy \(35,554.1\) ops/window (\(-21.55\%\) savings relative to Fixed-High; i.e., \(21.55\%\) greater computational work than standalone Fixed-High due to running Stage 1 prior to Stage 2 on 86.5% of windows).
+
+### 4.4 Status and Open Decision
+Because no candidate simultaneously meets the strict quality preservation constraint (\(\text{F1} \ge 0.9044\)) AND achieves positive computational savings (\(\text{Ops} < 29,250\)) under the current feature set, Phase 4 remains open for a team decision:
+- **Option A (v1.1 Quality-Preserving):** Adopt `cand_p60_clean_margin` to preserve full detection quality (\(\text{F1} = 0.9544\)), documenting that the cascade overhead exceeds Fixed-High standalone when 86% of windows escalate.
+- **Option B (Trade-off Reframe):** Adopt an intermediate candidate (such as `cand_p70_clean_margin`, \(\text{F1} = 0.9149\), \(79\%\) escalation, or retain v1.0) and formally frame the research findings as an accuracy-work Pareto trade-off.
+- **Option C (Feature Expansion):** Expand Stage 1 with a lightweight spectral/zero-crossing metric before freezing.
+

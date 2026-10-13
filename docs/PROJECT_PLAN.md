@@ -14,7 +14,7 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 | 1. Signal and feature foundation | Done | Generate labelled signals, preserve grouped splits, compute basic features, inspect previews. |
 | 2. Detection and frequency baselines | Done (Pilot) | Define and implement explicit fixed-low and fixed-high rules, calibrated on development data only. |
 | 3. Adaptive selector | Done (Pilot) | Add confidence/uncertainty criteria, escalation stages, and overhead accounting. |
-| 4. Pilot and protocol freeze | Done | Inspect errors, correct design issues, then freeze thresholds, splits, and metrics before final testing. |
+| 4. Pilot and protocol freeze | Review in progress | Development CV review completed; failure modes diagnosed; open for team trade-off decision. |
 | 5. Full evaluation | Not started | Evaluate held-out cases, robustness across noise, sensitivity to selector thresholds, runtime, operation proxy, and escalation rate. |
 | 6. Wokwi ESP32 demonstration | Not started | Demonstrate firmware decision flow using deterministic simulated or predefined samples. |
 | 7. Research report and presentation | Deferred | Write after implementation and evaluation results are complete. |

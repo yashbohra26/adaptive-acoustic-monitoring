@@ -1,6 +1,6 @@
 # Adaptive Acoustic Signal Processing for Machine Monitoring
 
-> **Project status:** Phase 1 (foundation), Phase 2 (fixed baselines), Phase 3 (adaptive selector), and Phase 4 (development review & protocol freeze) complete. The evaluation protocol is FROZEN in [`docs/EVALUATION_PROTOCOL.md`](docs/EVALUATION_PROTOCOL.md) and [`results/evaluation_protocol.json`](results/evaluation_protocol.json). Phase 5 full test evaluation, Phase 6 ESP32 simulation, and Phase 7 report remain unexecuted or deferred.
+> **Project status:** Phase 4 reopened for development-only selector review. A 5-fold grouped cross-validation candidate search has diagnosed the recall failure mode and identified the accuracy-work Pareto trade-off. Held-out test data (20 groups) remains strictly locked. Phase 5, Phase 6, and Phase 7 remain unexecuted/deferred.
 
 ## Project in one minute
 
@@ -30,8 +30,9 @@ This is a hypothesis to test, not a result we assume in advance. Simulation resu
 - [Phase 2 pilot runner](python/run_phase2_pilot.py): generates 80-group pilot dataset, fits reference models on fit groups, and calibrates thresholds on calibration groups.
 - [Phase 3 pilot runner](python/run_phase3_pilot.py): derives adaptive boundaries and evaluates development-only escalation distributions by case and SNR.
 - [Phase 4 development review](python/run_phase4_review.py): executes development-only diagnostic review across all three methods with group-level bootstrap CIs.
-- [Frozen evaluation protocol](docs/EVALUATION_PROTOCOL.md) & [machine-readable protocol](results/evaluation_protocol.json): frozen rules, boundaries, metrics, and operation formulas.
-- [Phase 4 review summary](results/phase4_review/): development diagnostic results and work accounting comparisons.
+- [Phase 4 grouped CV study](python/run_phase4_study.py): executes 5-fold grouped cross-validation candidate search across 12 selector configurations.
+- [Evaluation protocol](docs/EVALUATION_PROTOCOL.md) & [machine-readable protocol](results/evaluation_protocol.json): v1.0 baseline and Section 4 candidate analysis.
+- [CV study results](results/phase4_study/selector_study_results.json): out-of-fold metrics and quality constraint evaluation.
 - [Phase plan](docs/PROJECT_PLAN.md): deliverables and acceptance checks for each phase.
 - [Experiment specification](docs/EXPERIMENT_SPEC.md): shared rules, baseline rules, and adaptive selector policy.
 - [AI handoff guide](docs/AI_HANDOFF.md): how to use Antigravity and return its changes for review.
@@ -76,18 +77,21 @@ adaptive-acoustic-monitoring/
 │   ├── adaptive_selector.py
 │   ├── run_phase2_pilot.py
 │   ├── run_phase3_pilot.py
-│   └── run_phase4_review.py
+│   ├── run_phase4_review.py
+│   └── run_phase4_study.py
 ├── results/
 │   ├── preview/
 │   ├── phase2_pilot/
 │   ├── phase3_pilot/
 │   ├── phase4_review/
+│   ├── phase4_study/
 │   └── evaluation_protocol.json
 ├── tests/
 │   ├── test_phase1.py
 │   ├── test_phase2.py
 │   ├── test_phase3.py
-│   └── test_phase4.py
+│   ├── test_phase4.py
+│   └── test_phase4_cv.py
 └── docs/
     ├── PROJECT_PLAN.md
     ├── EXPERIMENT_SPEC.md
