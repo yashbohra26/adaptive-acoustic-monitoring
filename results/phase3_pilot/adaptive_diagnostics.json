@@ -1,0 +1,69 @@
+{
+  "dataset_summary": {
+    "total_groups": 80,
+    "dev_groups": 60,
+    "dev_windows": 960,
+    "test_groups": 20,
+    "test_windows": 320,
+    "test_status": "UNTOUCHED_AND_UNINSPECTED"
+  },
+  "selector_boundaries": {
+    "low_score_p90": 5.004375375048633,
+    "low_score_p99": 5.573238915756103,
+    "zcf_p01": 183.96484375,
+    "zcf_p99": 644.62890625
+  },
+  "overall_development_work_accounting": {
+    "total_windows": 960,
+    "fft_escalations": 354,
+    "overall_escalation_rate": 0.36875,
+    "avg_op_count_proxy": 21050.9375,
+    "fixed_low_op_count_proxy": 10265,
+    "fixed_high_op_count_proxy": 29250,
+    "avg_runtime_ms": 0.18049416630674386
+  },
+  "escalation_by_case": {
+    "added_harmonic": {
+      "total_windows": 240,
+      "escalated_count": 47,
+      "escalation_rate": 0.19583333333333333
+    },
+    "frequency_shift": {
+      "total_windows": 240,
+      "escalated_count": 40,
+      "escalation_rate": 0.16666666666666666
+    },
+    "impact": {
+      "total_windows": 240,
+      "escalated_count": 240,
+      "escalation_rate": 1.0
+    },
+    "normal": {
+      "total_windows": 240,
+      "escalated_count": 27,
+      "escalation_rate": 0.1125
+    }
+  },
+  "escalation_by_snr": {
+    "30.0": {
+      "total_windows": 240,
+      "escalated_count": 62,
+      "escalation_rate": 0.25833333333333336
+    },
+    "20.0": {
+      "total_windows": 240,
+      "escalated_count": 62,
+      "escalation_rate": 0.25833333333333336
+    },
+    "10.0": {
+      "total_windows": 240,
+      "escalated_count": 60,
+      "escalation_rate": 0.25
+    },
+    "0.0": {
+      "total_windows": 240,
+      "escalated_count": 170,
+      "escalation_rate": 0.7083333333333334
+    }
+  }
+}

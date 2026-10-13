@@ -13,7 +13,7 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 | 0. Scope and experiment contract | Done | Set the research question, labels, comparison principles, and evidence limits. |
 | 1. Signal and feature foundation | Done | Generate labelled signals, preserve grouped splits, compute basic features, inspect previews. |
 | 2. Detection and frequency baselines | Done (Pilot) | Define and implement explicit fixed-low and fixed-high rules, calibrated on development data only. |
-| 3. Adaptive selector | Not started | Add confidence/uncertainty criteria, escalation stages, and overhead accounting. |
+| 3. Adaptive selector | Done (Pilot) | Add confidence/uncertainty criteria, escalation stages, and overhead accounting. |
 | 4. Pilot and protocol freeze | Not started | Inspect errors, correct design issues, then freeze thresholds, splits, and metrics before final testing. |
 | 5. Full evaluation | Not started | Evaluate held-out cases, robustness across noise, sensitivity to selector thresholds, runtime, operation proxy, and escalation rate. |
 | 6. Wokwi ESP32 demonstration | Not started | Demonstrate firmware decision flow using deterministic simulated or predefined samples. |
@@ -67,16 +67,19 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 
 **Acceptance checks:** both methods emit anomaly decisions and frequency estimates; thresholds and calibration data are recorded; no test-set tuning occurs. Fitted parameters and provisional thresholds recorded in `results/phase2_pilot/pilot_calibration.json`.
 
-## Phase 3 — Adaptive selector
+## Phase 3 — Adaptive selector (Pilot Implemented)
 
 **Build:**
 
-- A cheap first stage with an explicit confidence or uncertainty measure.
-- Escalation to more detailed statistics and/or FFT only under documented conditions.
-- A record of the last stage used for each window.
-- Work accounting that includes the selector’s own calculations.
+- Two-stage adaptive selector (`AdaptiveSelector`) running `FixedLowDetector` first and conditionally escalating to `FixedHighDetector`.
+- Transparent decision boundaries derived strictly from normal calibration data:
+  - Low-stage score 90th and 99th percentiles.
+  - Zero-crossing frequency 1st and 99th percentiles.
+- Deterministic escalation triggers on out-of-range frequency or ambiguous low score.
+- Full work accounting: records stage reached (`stage1_low` or `stage2_high`), `fft_used` boolean, execution time, and operation-count proxy including selector overhead.
+- Development-only pilot evaluation (`results/phase3_pilot/`) recording escalation distributions by case and SNR without touching test data.
 
-**Acceptance checks:** report detection/frequency quality together with escalation share. If nearly every window reaches FFT, or quality collapses when FFT is avoided, report that honestly and revise only using development data.
+**Acceptance checks:** report detection/frequency quality together with escalation share. Confident cases stop cheaply at stage 1; impacts and out-of-range frequencies escalate reliably; work and runtime recorded separately. Fitted boundaries recorded in `results/phase3_pilot/adaptive_diagnostics.json`.
 
 ## Phase 4 — Pilot and protocol freeze
 

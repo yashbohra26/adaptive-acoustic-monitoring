@@ -32,9 +32,27 @@ Frequency-estimation ground truth is meaningful only for stable single-tone norm
 - **Decision rule & calibration:** Predict anomaly (\(1\)) if \(d(\mathbf{x}) > \tau_{\text{high}}\). Threshold \(\tau_{\text{high}}\) is calibrated as the \((1 - \text{FAR}_{\text{target}})\) percentile (e.g., 95th percentile for 5% target FAR) exclusively on normal threshold-calibration windows. Thresholds remain **provisional** until Phase 4 protocol freeze.
 - **Frequency estimation:** Strongest non-DC rFFT peak frequency estimate (\(\text{fft\_peak\_frequency}\)), evaluated only for single-tone cases with defined target frequency.
 
-### Adaptive (unimplemented)
+### Adaptive (implemented pilot selector)
 
-Start with the chosen cheap features and use a documented confidence/uncertainty policy to decide whether to stop or escalate. **OPEN:** exact confidence calculation, stages, and thresholds. Include the selector’s overhead in the work estimate. Unimplemented in Phase 2.
+- **Two-stage policy:**
+  1. Evaluate the Fixed-Low detector first to obtain low-stage standardized distance score \(d_{\text{low}}(\mathbf{x})\) and zero-crossing frequency estimate \(f_{\text{zcf}}(\mathbf{x})\).
+  2. Boundaries derived **exclusively from normal threshold-calibration windows**:
+     - Low score 90th percentile: \(\tau_{90}\) (e.g., \(\approx 5.0044\))
+     - Low score 99th percentile: \(\tau_{99}\) (e.g., \(\approx 5.5732\))
+     - Zero-crossing frequency 1st and 99th percentiles: \(f_{\text{zcf}, 1\%}\) and \(f_{\text{zcf}, 99\%}\) (e.g., \(\approx 183.96\) Hz and \(644.63\) Hz)
+  3. **Decision & Escalation Logic:**
+     - If \(f_{\text{zcf}}(\mathbf{x}) < f_{\text{zcf}, 1\%}\) or \(f_{\text{zcf}}(\mathbf{x}) > f_{\text{zcf}, 99\%}\): Escalate to Stage 2 (Fixed-High FFT) due to out-of-range zero-crossing frequency (`zcf_out_of_range`).
+     - Else if \(d_{\text{low}}(\mathbf{x}) \le \tau_{90}\): Stop at Stage 1 as Confidently Normal (`confident_normal`, label 0, `fft_used=False`).
+     - Else if \(d_{\text{low}}(\mathbf{x}) \ge \tau_{99}\): Stop at Stage 1 as Confidently Anomalous (`confident_anomaly`, label 1, `fft_used=False`).
+     - Else (\(\tau_{90} < d_{\text{low}}(\mathbf{x}) < \tau_{99}\)): Escalate to Stage 2 (Fixed-High FFT) due to ambiguous score (`uncertain_score`).
+  4. If escalated, the window is processed by Fixed-High, and its calibrated prediction and FFT peak frequency estimate are adopted.
+- **Work accounting:**
+  - `stage_reached`: `"stage1_low"` or `"stage2_high"`.
+  - `fft_used`: Boolean indicator recorded for every window.
+  - `op_count_proxy`: Operation-count proxy including selector overhead:
+    - Stage 1: \(10 N + 25\) ops (time-domain features + ZCF + robust distance + boundary checks). For \(N=1024\), \(10,265\) ops.
+    - Stage 2: additional \(2.5 N \log_2(N) + 3.5 N + 66\) ops (Hann window + rFFT + 16 band energies + normalization + distance). For \(N=1024\), \(29,250\) total ops.
+  - Desktop execution time in milliseconds recorded separately from operation counts. Neither represents physical hardware energy.
 
 ### Shared requirements
 

@@ -1,6 +1,6 @@
 # Adaptive Acoustic Signal Processing for Machine Monitoring
 
-> **Project status:** Phase 1 foundation complete; Phase 2 fixed baselines implemented and calibrated on development pilot data. The adaptive selector, full final test evaluation, and ESP32 simulation are not built yet. Report writing is intentionally deferred.
+> **Project status:** Phase 1 (foundation), Phase 2 (fixed baselines), and Phase 3 (adaptive selector) implemented and calibrated on development pilot data. Phase 4 protocol freeze, Phase 5 full evaluation on held-out test data, and ESP32 simulation are not started yet. Report writing is intentionally deferred.
 
 ## Project in one minute
 
@@ -26,11 +26,12 @@ This is a hypothesis to test, not a result we assume in advance. Simulation resu
 - [Signal generator](python/generate_signals.py): creates normal, frequency-shift, added-harmonic, and impact windows with known labels, parameters, and grouped development (fit/calibration) / test splits.
 - [Feature functions](python/features.py): RMS, crest factor, kurtosis, zero-crossing frequency, FFT peak estimate, and normalized band energies (16 bands, 0-1200 Hz).
 - [Baseline detectors](python/baselines.py): Fixed-Low (log time-domain features) and Fixed-High (16-band normalized spectral energies) with robust distance scoring and calibrated thresholds.
-- [Phase 2 pilot runner](python/run_phase2_pilot.py): generates 80-group pilot dataset, fits reference models on fit groups, and calibrates thresholds on calibration groups targeting 5% FAR.
-- [Preview data and chart](results/preview/): generated from an 8-group pilot dataset.
-- [Phase 2 pilot outputs](results/phase2_pilot/): metadata splits, fitted parameters, and provisional calibration details.
+- [Adaptive selector](python/adaptive_selector.py): two-stage context-aware detector with deterministic escalation boundaries and complete work accounting.
+- [Phase 2 pilot runner](python/run_phase2_pilot.py): generates 80-group pilot dataset, fits reference models on fit groups, and calibrates thresholds on calibration groups.
+- [Phase 3 pilot runner](python/run_phase3_pilot.py): derives adaptive boundaries and evaluates development-only escalation distributions by case and SNR.
+- [Phase 3 pilot outputs](results/phase3_pilot/): adaptive diagnostics and development prediction records.
 - [Phase plan](docs/PROJECT_PLAN.md): deliverables and acceptance checks for each phase.
-- [Experiment specification](docs/EXPERIMENT_SPEC.md): shared rules and provisional baseline specifications.
+- [Experiment specification](docs/EXPERIMENT_SPEC.md): shared rules, baseline rules, and adaptive selector policy.
 - [AI handoff guide](docs/AI_HANDOFF.md): how to use Antigravity and return its changes for review.
 - [AI project instructions](AGENTS.md): concise context and constraints for coding agents.
 - [Contributing guide](CONTRIBUTING.md): setup, collaboration, and change-review instructions for teammates.
@@ -70,13 +71,17 @@ adaptive-acoustic-monitoring/
 │   ├── generate_signals.py
 │   ├── features.py
 │   ├── baselines.py
-│   └── run_phase2_pilot.py
+│   ├── adaptive_selector.py
+│   ├── run_phase2_pilot.py
+│   └── run_phase3_pilot.py
 ├── results/
 │   ├── preview/
-│   └── phase2_pilot/
+│   ├── phase2_pilot/
+│   └── phase3_pilot/
 ├── tests/
 │   ├── test_phase1.py
-│   └── test_phase2.py
+│   ├── test_phase2.py
+│   └── test_phase3.py
 └── docs/
     ├── PROJECT_PLAN.md
     ├── EXPERIMENT_SPEC.md
