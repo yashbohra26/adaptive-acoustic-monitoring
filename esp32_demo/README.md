@@ -75,17 +75,21 @@ g++ -std=c++11 -O2 -I esp32_demo esp32_demo/test_harness.cpp -o esp32_demo/test_
 **Outcome:** Confirms 100% decision and stage parity between Python Protocol v1.1.0 and C++ on all 5 demo vectors.
 
 ### Option B: Wokwi VS Code Extension
-1. Install the **Wokwi Simulator** extension in VS Code.
-2. Build the project using PlatformIO (`pio run`).
-3. Press `F1` and select **Wokwi: Start Simulator**, or open `diagram.json`.
-4. Open the Serial Monitor (115200 baud) to view the real-time classification cycle.
+1. Install the **Wokwi Simulator** and **PlatformIO IDE** extensions in VS Code.
+2. Open either the `esp32_demo` subfolder directly in VS Code (`File > Open Folder... > esp32_demo`) OR open the repository root:
+   - If opened from `esp32_demo/`: Run `pio run` in the terminal to compile `.pio/build/esp32dev/firmware.bin`.
+   - If opened from the repository root: Run `pio run -d esp32_demo` to compile, then press `F1` > **Wokwi: Select Config File** > select `esp32_demo/wokwi.toml`.
+3. Open `esp32_demo/diagram.json` and click the green **Play** button (or press `F1` > **Wokwi: Start Simulator**).
+4. The Serial Monitor (115200 baud) will launch automatically displaying the real-time classification cycle.
 
-### Option C: Wokwi Web Simulator (wokwi.com)
+### Option C: Wokwi Web Simulator (wokwi.com - Zero Install)
 1. Go to [wokwi.com/projects/new/esp32](https://wokwi.com/projects/new/esp32).
-2. Replace `sketch.ino` with the contents of `src/main.cpp`.
-3. Add a new tab `adaptive_core.h` and paste the contents of `src/adaptive_core.h`.
-4. Add a new tab `demo_vectors.h` and paste the contents of `src/demo_vectors.h`.
-5. Click **Start Simulation** and inspect the Serial output.
+2. In the `sketch.ino` tab, replace its entire content with [`src/main.cpp`](src/main.cpp).
+3. Click the dropdown arrow next to the tabs (or **+** button) and select **New File**:
+   - Create `adaptive_core.h` and paste the contents of [`src/adaptive_core.h`](src/adaptive_core.h).
+   - Create `demo_vectors.h` and paste the contents of [`src/demo_vectors.h`](src/demo_vectors.h).
+4. Optionally replace the `diagram.json` tab with [`diagram.json`](diagram.json).
+5. Click **Start Simulation** (green play button) and watch the Serial Monitor pane at 115200 baud.
 
 ---
 
