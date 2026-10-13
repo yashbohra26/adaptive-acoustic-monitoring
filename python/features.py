@@ -56,3 +56,49 @@ def extract_features(x: np.ndarray, sample_rate_hz: int) -> dict[str, float]:
         "zero_crossing_frequency_hz": zero_crossing_frequency(x, sample_rate_hz),
         "fft_peak_frequency_hz": fft_peak_frequency(x, sample_rate_hz),
     }
+
+
+def normalized_band_energies(
+    x: np.ndarray,
+    sample_rate_hz: int,
+    freq_min_hz: float = 0.0,
+    freq_max_hz: float = 1200.0,
+    num_bands: int = 16,
+) -> np.ndarray:
+    """Compute normalized energy across fixed frequency bands from rFFT.
+
+    Energy in each band is computed as the sum of squared magnitudes of rFFT bins
+    within [band_start, band_end). The resulting band energies are normalized by the
+    total energy across all bands (plus an epsilon) so the vector sums to ~1.0.
+    """
+    x = np.asarray(x, dtype=float)
+    if len(x) < 4:
+        return np.zeros(num_bands, dtype=float)
+
+    windowed = (x - np.mean(x)) * np.hanning(len(x))
+    spectrum = np.abs(np.fft.rfft(windowed))
+    power = spectrum**2
+    freqs = np.fft.rfftfreq(len(x), 1.0 / sample_rate_hz)
+
+    band_edges = np.linspace(freq_min_hz, freq_max_hz, num_bands + 1)
+    band_energies = np.zeros(num_bands, dtype=float)
+
+    for i in range(num_bands):
+        f_low = band_edges[i]
+        f_high = band_edges[i + 1]
+        # Include left edge, include right edge on last band
+        if i == num_bands - 1:
+            idx = (freqs >= f_low) & (freqs <= f_high)
+        else:
+            idx = (freqs >= f_low) & (freqs < f_high)
+        if np.any(idx):
+            band_energies[i] = float(np.sum(power[idx]))
+
+    total_energy = float(np.sum(band_energies))
+    if total_energy > 1e-12:
+        band_energies = band_energies / total_energy
+    else:
+        band_energies = np.zeros(num_bands, dtype=float)
+
+    return band_energies
+

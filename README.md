@@ -1,6 +1,6 @@
 # Adaptive Acoustic Signal Processing for Machine Monitoring
 
-> **Project status:** Phase 1 foundation is in progress. Signal generation and feature calculations exist; the method comparison, full experiment, and ESP32 simulation are not built yet. Report writing is intentionally deferred.
+> **Project status:** Phase 1 foundation complete; Phase 2 fixed baselines implemented and calibrated on development pilot data. The adaptive selector, full final test evaluation, and ESP32 simulation are not built yet. Report writing is intentionally deferred.
 
 ## Project in one minute
 
@@ -23,11 +23,14 @@ This is a hypothesis to test, not a result we assume in advance. Simulation resu
 ## Current build
 
 - [Configuration](python/config.py): sample rate, duration, case ranges, SNRs, split fraction, and reproducible seed.
-- [Signal generator](python/generate_signals.py): creates normal, frequency-shift, added-harmonic, and impact windows with known labels and parameters.
-- [Feature functions](python/features.py): RMS, crest factor, kurtosis, zero-crossing frequency estimate, and FFT peak estimate. These functions calculate features; they do not classify windows.
-- [Preview data and chart](results/preview/feature_preview.csv) and [signal preview SVG](results/preview/signal_preview.svg): generated from an eight-group pilot dataset.
+- [Signal generator](python/generate_signals.py): creates normal, frequency-shift, added-harmonic, and impact windows with known labels, parameters, and grouped development (fit/calibration) / test splits.
+- [Feature functions](python/features.py): RMS, crest factor, kurtosis, zero-crossing frequency, FFT peak estimate, and normalized band energies (16 bands, 0-1200 Hz).
+- [Baseline detectors](python/baselines.py): Fixed-Low (log time-domain features) and Fixed-High (16-band normalized spectral energies) with robust distance scoring and calibrated thresholds.
+- [Phase 2 pilot runner](python/run_phase2_pilot.py): generates 80-group pilot dataset, fits reference models on fit groups, and calibrates thresholds on calibration groups targeting 5% FAR.
+- [Preview data and chart](results/preview/): generated from an 8-group pilot dataset.
+- [Phase 2 pilot outputs](results/phase2_pilot/): metadata splits, fitted parameters, and provisional calibration details.
 - [Phase plan](docs/PROJECT_PLAN.md): deliverables and acceptance checks for each phase.
-- [Experiment specification](docs/EXPERIMENT_SPEC.md): shared rules to preserve a fair comparison.
+- [Experiment specification](docs/EXPERIMENT_SPEC.md): shared rules and provisional baseline specifications.
 - [AI handoff guide](docs/AI_HANDOFF.md): how to use Antigravity and return its changes for review.
 - [AI project instructions](AGENTS.md): concise context and constraints for coding agents.
 - [Contributing guide](CONTRIBUTING.md): setup, collaboration, and change-review instructions for teammates.
@@ -65,11 +68,15 @@ adaptive-acoustic-monitoring/
 ├── python/
 │   ├── config.py
 │   ├── generate_signals.py
-│   └── features.py
+│   ├── features.py
+│   ├── baselines.py
+│   └── run_phase2_pilot.py
 ├── results/
-│   └── preview/
+│   ├── preview/
+│   └── phase2_pilot/
 ├── tests/
-│   └── test_phase1.py
+│   ├── test_phase1.py
+│   └── test_phase2.py
 └── docs/
     ├── PROJECT_PLAN.md
     ├── EXPERIMENT_SPEC.md

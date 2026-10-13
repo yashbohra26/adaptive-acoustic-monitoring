@@ -11,8 +11,8 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 | Phase | Status | Purpose |
 |---|---|---|
 | 0. Scope and experiment contract | Done | Set the research question, labels, comparison principles, and evidence limits. |
-| 1. Signal and feature foundation | In progress | Generate labelled signals, preserve grouped splits, compute basic features, inspect previews. |
-| 2. Detection and frequency baselines | Not started | Define and implement explicit fixed-low and fixed-high rules, calibrated on development data only. |
+| 1. Signal and feature foundation | Done | Generate labelled signals, preserve grouped splits, compute basic features, inspect previews. |
+| 2. Detection and frequency baselines | Done (Pilot) | Define and implement explicit fixed-low and fixed-high rules, calibrated on development data only. |
 | 3. Adaptive selector | Not started | Add confidence/uncertainty criteria, escalation stages, and overhead accounting. |
 | 4. Pilot and protocol freeze | Not started | Inspect errors, correct design issues, then freeze thresholds, splits, and metrics before final testing. |
 | 5. Full evaluation | Not started | Evaluate held-out cases, robustness across noise, sensitivity to selector thresholds, runtime, operation proxy, and escalation rate. |
@@ -53,18 +53,19 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 
 **Current remaining work:** inspect generated cases; decide whether the initial signal distribution and group count are adequate; optionally add a reverberation model after the clean/noisy pipeline is stable.
 
-## Phase 2 — Fixed baselines
+## Phase 2 — Fixed baselines (Pilot Implemented)
 
 **Build:**
 
-- Fixed-low detector using inexpensive features only, with a documented decision rule.
-- Fixed-high detector using FFT-based spectral evidence and a documented decision rule.
-- Development-only calibration for both methods under the same target detection requirement.
-- Frequency output for both where the case defines a target.
+- Fixed-low detector using inexpensive features only (log RMS, log crest factor, log kurtosis) with standardized distance from normal fit median/scale.
+- Fixed-high detector using FFT-based normalized band energies (16 bands, 0-1200 Hz) with standardized distance from normal fit median/scale.
+- Development-only calibration for both methods targeting 5% false-alarm rate on normal threshold-calibration windows.
+- Frequency output for both where the case defines a target (zero-crossing for fixed-low, FFT peak for fixed-high).
+- 80-group pilot dataset generated (60 development groups split 30/30 into fit/calibration, 20 test groups held out untouched).
 
 **Key rule:** RMS alone is signal level, not a reliable definition of abnormality. Calibrate it and evaluate loud-normal false alarms and quieter anomalies. FFT computation alone is not an anomaly detector; specify what spectral evidence determines the label.
 
-**Acceptance checks:** both methods emit anomaly decisions and frequency estimates; thresholds and calibration data are recorded; no test-set tuning occurs.
+**Acceptance checks:** both methods emit anomaly decisions and frequency estimates; thresholds and calibration data are recorded; no test-set tuning occurs. Fitted parameters and provisional thresholds recorded in `results/phase2_pilot/pilot_calibration.json`.
 
 ## Phase 3 — Adaptive selector
 

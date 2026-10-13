@@ -42,8 +42,19 @@ def synthesize_case(case: str, f0: float, snr_db: float, rng: np.random.Generato
     return noisy.astype(np.float64), target
 
 
-def build_dataset(groups: int, config: StudyConfig = DEFAULT_CONFIG):
-    """Return records and in-memory signals; split entire source groups together."""
+def build_dataset(
+    groups: int,
+    config: StudyConfig = DEFAULT_CONFIG,
+    dev_calibration_fraction: float = 0.5,
+):
+    """Return records and in-memory signals; split entire source groups together.
+
+    Source groups are partitioned into:
+    - 'test': held-out test groups based on config.test_fraction.
+    - 'development': further sub-assigned via 'dev_subset' into:
+      - 'fit': used solely for estimating normal reference feature distributions.
+      - 'calibration': used solely for calibrating anomaly thresholds.
+    """
     if groups < 4:
         raise ValueError("Use at least 4 groups to create development and test splits")
     rng = np.random.default_rng(config.seed)
@@ -53,9 +64,27 @@ def build_dataset(groups: int, config: StudyConfig = DEFAULT_CONFIG):
     order = rng.permutation(groups)
     n_test = max(1, round(groups * config.test_fraction))
     test_ids = {group_specs[int(i)][0] for i in order[:n_test]}
+    
+    # Partition remaining development groups into fit and calibration subsets reproducibly
+    dev_group_ids = [group_specs[int(i)][0] for i in order[n_test:]]
+    dev_rng = np.random.default_rng(config.seed + 2)
+    dev_order = dev_rng.permutation(len(dev_group_ids))
+    n_calib = max(1, round(len(dev_group_ids) * dev_calibration_fraction))
+    calib_ids = {dev_group_ids[int(i)] for i in dev_order[:n_calib]}
+    fit_ids = {gid for gid in dev_group_ids if gid not in calib_ids}
+
     records, signals = [], {}
     for group_id, f0 in group_specs:
-        split = "test" if group_id in test_ids else "development"
+        if group_id in test_ids:
+            split = "test"
+            dev_subset = ""
+        elif group_id in calib_ids:
+            split = "development"
+            dev_subset = "calibration"
+        else:
+            split = "development"
+            dev_subset = "fit"
+
         for case in SIGNAL_CASES:
             for snr in config.snr_db_levels:
                 # Keep the clean recipe fixed across SNRs; vary only the noise realization.
@@ -68,6 +97,7 @@ def build_dataset(groups: int, config: StudyConfig = DEFAULT_CONFIG):
                 records.append({
                     "group_id": group_id,
                     "split": split,
+                    "dev_subset": dev_subset,
                     "case": case,
                     "anomaly": int(case != "normal"),
                     "snr_db": snr,
@@ -77,6 +107,7 @@ def build_dataset(groups: int, config: StudyConfig = DEFAULT_CONFIG):
                     "signal_key": key,
                 })
     return records, signals
+
 
 
 def write_metadata(records, path: Path) -> None:

@@ -10,17 +10,31 @@ Frequency-estimation ground truth is meaningful only for stable single-tone norm
 
 ## Methods and fairness requirements
 
-### Fixed-low
+### Fixed-low (implemented pilot baseline)
 
-Use inexpensive features only. **OPEN:** choose the exact anomaly score and calibrated rule. RMS by itself is only signal level; it can confuse a loud normal case with an anomaly. Candidate cheap features include RMS, crest factor, and kurtosis.
+- **Features:** 3 inexpensive time-domain features: \([\log(\text{RMS}), \log(\text{crest factor}), \log(\text{kurtosis})]\).
+- **Fitting:** Normal model-fit windows only are used to compute feature-wise medians and robust scales (\(\text{MAD} \times 1.4826\), with scale floor \(10^{-4}\)).
+- **Anomaly score:** Standardized Euclidean distance (robust z-score distance):
+  \[
+  d(\mathbf{x}) = \sqrt{\sum_{i=1}^3 \left(\frac{x_i - \text{median}_i}{\text{scale}_i}\right)^2}
+  \]
+- **Decision rule & calibration:** Predict anomaly (\(1\)) if \(d(\mathbf{x}) > \tau_{\text{low}}\). Threshold \(\tau_{\text{low}}\) is calibrated as the \((1 - \text{FAR}_{\text{target}})\) percentile (e.g., 95th percentile for 5% target FAR) exclusively on normal threshold-calibration windows. Thresholds remain **provisional** until Phase 4 protocol freeze.
+- **Frequency estimation:** Zero-crossing frequency estimate (\(\text{zero\_crossing\_frequency}\)), evaluated only for single-tone cases with defined target frequency.
 
-### Fixed-high
+### Fixed-high (implemented pilot baseline)
 
-Always compute FFT-based features. **OPEN:** define a spectral anomaly score (for example, deviation from a development-set normal spectral profile) and its calibration rule. An FFT transform alone does not make a prediction.
+- **Features:** 16-dimensional normalized band energy vector computed from Hann-windowed rFFT across 0–1200 Hz (uniform bands of 75 Hz bandwidth, normalized to unit sum).
+- **Fitting:** Normal model-fit windows only are used to compute band-wise medians and robust scales (\(\text{MAD} \times 1.4826\), with scale floor \(10^{-4}\)).
+- **Anomaly score:** Standardized Euclidean distance (robust z-score distance):
+  \[
+  d(\mathbf{x}) = \sqrt{\sum_{i=1}^{16} \left(\frac{x_i - \text{median}_i}{\text{scale}_i}\right)^2}
+  \]
+- **Decision rule & calibration:** Predict anomaly (\(1\)) if \(d(\mathbf{x}) > \tau_{\text{high}}\). Threshold \(\tau_{\text{high}}\) is calibrated as the \((1 - \text{FAR}_{\text{target}})\) percentile (e.g., 95th percentile for 5% target FAR) exclusively on normal threshold-calibration windows. Thresholds remain **provisional** until Phase 4 protocol freeze.
+- **Frequency estimation:** Strongest non-DC rFFT peak frequency estimate (\(\text{fft\_peak\_frequency}\)), evaluated only for single-tone cases with defined target frequency.
 
-### Adaptive
+### Adaptive (unimplemented)
 
-Start with the chosen cheap features and use a documented confidence/uncertainty policy to decide whether to stop or escalate. **OPEN:** exact confidence calculation, stages, and thresholds. Include the selector’s overhead in the work estimate.
+Start with the chosen cheap features and use a documented confidence/uncertainty policy to decide whether to stop or escalate. **OPEN:** exact confidence calculation, stages, and thresholds. Include the selector’s overhead in the work estimate. Unimplemented in Phase 2.
 
 ### Shared requirements
 
