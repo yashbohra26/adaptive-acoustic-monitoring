@@ -1,0 +1,210 @@
+{
+  "protocol_version": "1.1.0",
+  "status": "FROZEN",
+  "date_frozen": "2026-10-14",
+  "description": "Frozen evaluation protocol v1.1 for Phase 5 method comparison on held-out test data carrying Candidate Selector v1.1.",
+  "dataset_specification": {
+    "generator_version": "1.0.0",
+    "master_seed": 20261013,
+    "sample_rate_hz": 4000,
+    "duration_s": 0.256,
+    "samples_per_window": 1024,
+    "snr_db_levels": [30.0, 20.0, 10.0, 0.0],
+    "normal_frequency_range_hz": [180.0, 260.0],
+    "shift_ratio_range": [1.35, 1.6],
+    "impact_decay_s": 0.009,
+    "impact_carrier_range_hz": [500.0, 900.0],
+    "signal_cases": ["normal", "frequency_shift", "added_harmonic", "impact"],
+    "total_source_groups": 80,
+    "total_windows": 1280,
+    "split_policy": {
+      "development_source_groups": 60,
+      "held_out_test_source_groups": 20,
+      "development_windows": 960,
+      "held_out_test_windows": 320,
+      "dev_split_hash_sha256_prefix16": "9ece130e3b4054a7",
+      "test_split_hash_sha256_prefix16": "b99e0b36ea5b6659",
+      "held_out_test_group_ids": [
+        "g0000", "g0004", "g0005", "g0009", "g0015",
+        "g0020", "g0022", "g0024", "g0029", "g0032",
+        "g0033", "g0034", "g0042", "g0046", "g0062",
+        "g0067", "g0068", "g0070", "g0077", "g0078"
+      ],
+      "development_partitions": {
+        "model_fit_groups": 30,
+        "threshold_calibration_groups": 30,
+        "model_fit_windows": 480,
+        "threshold_calibration_windows": 480,
+        "fit_normal_windows": 120,
+        "calib_normal_windows": 120,
+        "fit_group_ids": [
+          "g0001", "g0002", "g0010", "g0011", "g0013",
+          "g0017", "g0021", "g0023", "g0025", "g0026",
+          "g0028", "g0030", "g0038", "g0039", "g0040",
+          "g0041", "g0045", "g0047", "g0048", "g0050",
+          "g0052", "g0054", "g0056", "g0058", "g0061",
+          "g0064", "g0074", "g0075", "g0076", "g0079"
+        ],
+        "calib_group_ids": [
+          "g0003", "g0006", "g0007", "g0008", "g0012",
+          "g0014", "g0016", "g0018", "g0019", "g0027",
+          "g0031", "g0035", "g0036", "g0037", "g0043",
+          "g0044", "g0049", "g0051", "g0053", "g0055",
+          "g0057", "g0059", "g0060", "g0063", "g0065",
+          "g0066", "g0069", "g0071", "g0072", "g0073"
+        ]
+      }
+    }
+  },
+  "frozen_methods": {
+    "fixed_low": {
+      "method_name": "fixed_low",
+      "features": ["log_rms", "log_crest_factor", "log_kurtosis"],
+      "feature_floors": 1e-8,
+      "scale_floor": 1e-4,
+      "scoring_function": "standardized_euclidean_distance",
+      "fit_partition": "normal_model_fit_windows_only",
+      "reference_median": [
+        -0.42214823879010144,
+        0.6272318169085866,
+        0.4827222228281898
+      ],
+      "reference_scale": [
+        0.13246204372113413,
+        0.3220857059397265,
+        0.1134682015469265
+      ],
+      "calibration_partition": "normal_threshold_calibration_windows_only",
+      "target_calibration_far": 0.05,
+      "frozen_threshold": 5.2742122278682135,
+      "frequency_estimator": "zero_crossing_frequency"
+    },
+    "fixed_high": {
+      "method_name": "fixed_high",
+      "features": "16_band_normalized_energies_0_to_1200_hz",
+      "scale_floor": 1e-4,
+      "scoring_function": "standardized_euclidean_distance",
+      "fit_partition": "normal_model_fit_windows_only",
+      "reference_median": [
+        0.0016098756515246367,
+        0.0011130730848692176,
+        0.6476407801573868,
+        0.017614290023804213,
+        0.0012432270764652226,
+        0.0009764492435953226,
+        0.0012827107677708194,
+        0.0013166742764058438,
+        0.001393226388481232,
+        0.0013515235366739278,
+        0.0015330062048455736,
+        0.0014491711121808095,
+        0.0014370000128566963,
+        0.001213075046721345,
+        0.0011857169496486946,
+        0.0010682191842857848
+      ],
+      "reference_scale": [
+        0.002280641863518455,
+        0.0016194550090873354,
+        0.5214032120460864,
+        0.02605633671604529,
+        0.0018205107170725003,
+        0.001401904437192491,
+        0.001872765116783633,
+        0.0019152535648971247,
+        0.002031359003566385,
+        0.0019479872411045725,
+        0.002229228722957086,
+        0.0021018578021130443,
+        0.0020844644716759633,
+        0.001760355614508183,
+        0.0017169219198419337,
+        0.0015484889703014405
+      ],
+      "calibration_partition": "normal_threshold_calibration_windows_only",
+      "target_calibration_far": 0.05,
+      "frozen_threshold": 55.309465532998374,
+      "frequency_estimator": "fft_peak_frequency"
+    },
+    "adaptive_v1.0_historical": {
+      "method_name": "adaptive_v1.0",
+      "policy": "two_stage_cascade_historical",
+      "stage1_detector": "fixed_low",
+      "stage2_detector": "fixed_high",
+      "calibration_partition": "normal_threshold_calibration_windows_only",
+      "frozen_boundaries": {
+        "low_score_p90": 5.004375375048633,
+        "low_score_p99": 5.573238915756103,
+        "zcf_p01_hz": 183.96484375,
+        "zcf_p99_hz": 644.62890625
+      },
+      "decision_rules": {
+        "step1": "if zcf < zcf_p01 or zcf > zcf_p99 -> escalate to Fixed-High (zcf_out_of_range)",
+        "step2": "elif low_score <= low_score_p90 -> stop at Stage 1 as Normal (confident_normal)",
+        "step3": "elif low_score >= low_score_p99 -> stop at Stage 1 as Anomaly (confident_anomaly)",
+        "step4": "else -> escalate to Fixed-High (uncertain_score)"
+      }
+    },
+    "adaptive_v1.1_candidate": {
+      "method_name": "candidate_adaptive_v1.1",
+      "policy": "two_stage_cascade_anomaly_first",
+      "stage1_detector": "fixed_low",
+      "stage2_detector": "fixed_high",
+      "calibration_partition": "normal_threshold_calibration_windows_only",
+      "calibration_parameters": {
+        "p_normal_percentile": 60.0,
+        "p_anomaly_multiplier": 1.2,
+        "snr_clean_threshold_db": 20.0,
+        "margin_hz": 10.0
+      },
+      "frozen_boundaries": {
+        "low_score_p_normal": 1.771419504531532,
+        "low_score_p_anomaly": 7.140502430084831,
+        "zcf_min_hz": 173.59375,
+        "zcf_max_hz": 263.90625
+      },
+      "decision_rules": {
+        "step1_confident_anomaly": "if low_score >= low_score_p_anomaly (7.1405) -> stop at Stage 1 as Anomaly (stage1_low, label=1, fft_used=False, ops=10265, reason='confident_anomaly')",
+        "step2_frequency_check": "elif zcf < zcf_min (173.59 Hz) or zcf > zcf_max (263.91 Hz) -> escalate to Fixed-High (stage2_high, fft_used=True, ops=39515, reason='zcf_out_of_range')",
+        "step3_confident_normal": "elif low_score <= low_score_p_normal (1.7714) -> stop at Stage 1 as Normal (stage1_low, label=0, fft_used=False, ops=10265, reason='confident_normal')",
+        "step4_uncertain_score": "else (1.7714 < low_score < 7.1405) -> escalate to Fixed-High (stage2_high, fft_used=True, ops=39515, reason='uncertain_score')"
+      }
+    }
+  },
+  "evaluation_metrics": {
+    "detection_metrics": {
+      "precision": "TP / (TP + FP)",
+      "recall": "TP / (TP + FN)",
+      "f1": "2 * precision * recall / (precision + recall)",
+      "false_alarm_rate": "FP / (FP + TN) on normal ground-truth windows"
+    },
+    "frequency_metrics": {
+      "eligible_cases": ["normal", "frequency_shift"],
+      "metric": "Mean Absolute Error (MAE) in Hz relative to target_frequency_hz",
+      "excluded_cases": ["added_harmonic", "impact"]
+    },
+    "work_accounting": {
+      "stage1_ops_per_window": 10265,
+      "stage1_formula": "10 * N + 25 (for N=1024)",
+      "stage2_additional_ops_per_window": 29250,
+      "stage2_additional_formula": "2.5 * N * log2(N) + 3.5 * N + 66 (for N=1024)",
+      "stage2_cumulative_ops_per_window": 39515,
+      "stage2_cumulative_formula": "Stage 1 + Stage 2 = 10265 + 29250 = 39515 (for N=1024)",
+      "fixed_low_standalone_ops": 10265,
+      "fixed_high_standalone_ops": 29250,
+      "adaptive_weighted_ops_formula": "(N_stage1 * 10265 + N_stage2 * 39515) / N_total",
+      "note": "Operation count proxy represents mathematical operations and selector overhead. It does NOT represent physical ESP32 energy consumption."
+    },
+    "runtime_measurement": {
+      "method": "Wall-clock execution time via time.perf_counter() per window",
+      "environment_reporting": "Reported separately from operation proxy as desktop Python runtime"
+    },
+    "uncertainty_estimation": {
+      "method": "Group-level bootstrap resampling (1000 iterations)",
+      "random_seed": 20261013,
+      "rationale": "Windows from the same machine group are correlated across SNRs and cases; group-level resampling accounts for cluster correlation",
+      "limitations": "20 held-out groups provide finite cluster sample size; reported CIs reflect group variance"
+    },
+    "final_holdout_statement": "The 20 held-out test groups are evaluated ONCE as a final verification. No thresholds, parameters, features, or rules shall be tuned or altered based on test outcomes."
+  }
+}
