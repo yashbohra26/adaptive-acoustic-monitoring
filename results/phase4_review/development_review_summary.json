@@ -1,0 +1,308 @@
+{
+  "status": "DEVELOPMENT_DIAGNOSTICS_ONLY",
+  "notice": "These metrics are development-set pilot diagnostics for model review and protocol freeze. They are NOT unbiased held-out generalization test results.",
+  "dataset_split": {
+    "source_groups": 80,
+    "development_groups": 60,
+    "held_out_test_groups": 20,
+    "development_windows": 960,
+    "held_out_test_windows_locked": 320
+  },
+  "methods_comparison": {
+    "Fixed-Low": {
+      "overall_binary": {
+        "tp": 288,
+        "fp": 11,
+        "tn": 229,
+        "fn": 432,
+        "precision": 0.9632107023411371,
+        "recall": 0.4,
+        "f1": 0.5652600588812561,
+        "false_alarm_rate": 0.04583333333333333
+      },
+      "bootstrap_ci95": {
+        "f1_ci95": [
+          0.5522682445759369,
+          0.5792031098153547
+        ],
+        "far_ci95": [
+          0.025,
+          0.07083333333333333
+        ],
+        "recall_ci95": [
+          0.3888888888888889,
+          0.4125
+        ]
+      },
+      "frequency_estimation": {
+        "count": 480,
+        "mae_hz": 93.40615254792534,
+        "median_err_hz": 1.8757662853185622
+      },
+      "average_op_count_proxy": 10265.0,
+      "performance_by_case": {
+        "normal": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.04583333333333333,
+          "metric": "false_alarm_rate",
+          "value": 0.04583333333333333
+        },
+        "frequency_shift": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.04583333333333333,
+          "metric": "recall",
+          "value": 0.04583333333333333
+        },
+        "added_harmonic": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.15416666666666667,
+          "metric": "recall",
+          "value": 0.15416666666666667
+        },
+        "impact": {
+          "count": 240,
+          "predicted_anomaly_fraction": 1.0,
+          "metric": "recall",
+          "value": 1.0
+        }
+      },
+      "performance_by_snr": {
+        "30.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 0.7692519911020177
+        },
+        "20.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 0.7718814500428609
+        },
+        "10.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 20.9794918312574
+        },
+        "0.0": {
+          "count": 240,
+          "precision": 0.907563025210084,
+          "recall": 0.6,
+          "f1": 0.7224080267558528,
+          "false_alarm_rate": 0.18333333333333332,
+          "freq_mae_hz": 351.1039849192991
+        }
+      }
+    },
+    "Fixed-High": {
+      "overall_binary": {
+        "tp": 669,
+        "fp": 11,
+        "tn": 229,
+        "fn": 51,
+        "precision": 0.9838235294117647,
+        "recall": 0.9291666666666667,
+        "f1": 0.9557142857142856,
+        "false_alarm_rate": 0.04583333333333333
+      },
+      "bootstrap_ci95": {
+        "f1_ci95": [
+          0.9360418502949353,
+          0.9717942267159
+        ],
+        "far_ci95": [
+          0.020833333333333332,
+          0.07083333333333333
+        ],
+        "recall_ci95": [
+          0.8944444444444445,
+          0.9611111111111111
+        ]
+      },
+      "frequency_estimation": {
+        "count": 480,
+        "mae_hz": 1.0183818978835921,
+        "median_err_hz": 0.9953231945054739
+      },
+      "average_op_count_proxy": 29250.0,
+      "performance_by_case": {
+        "normal": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.04583333333333333,
+          "metric": "false_alarm_rate",
+          "value": 0.04583333333333333
+        },
+        "frequency_shift": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.7875,
+          "metric": "recall",
+          "value": 0.7875
+        },
+        "added_harmonic": {
+          "count": 240,
+          "predicted_anomaly_fraction": 1.0,
+          "metric": "recall",
+          "value": 1.0
+        },
+        "impact": {
+          "count": 240,
+          "predicted_anomaly_fraction": 1.0,
+          "metric": "recall",
+          "value": 1.0
+        }
+      },
+      "performance_by_snr": {
+        "30.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.9277777777777778,
+          "f1": 0.962536023054755,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 1.0182180772596838
+        },
+        "20.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.9277777777777778,
+          "f1": 0.962536023054755,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 1.018214026398899
+        },
+        "10.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.9277777777777778,
+          "f1": 0.962536023054755,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 1.0188774106161014
+        },
+        "0.0": {
+          "count": 240,
+          "precision": 0.9385474860335196,
+          "recall": 0.9333333333333333,
+          "f1": 0.935933147632312,
+          "false_alarm_rate": 0.18333333333333332,
+          "freq_mae_hz": 1.0182180772596838
+        }
+      }
+    },
+    "Adaptive": {
+      "overall_binary": {
+        "tp": 334,
+        "fp": 9,
+        "tn": 231,
+        "fn": 386,
+        "precision": 0.9737609329446064,
+        "recall": 0.4638888888888889,
+        "f1": 0.6284101599247413,
+        "false_alarm_rate": 0.0375
+      },
+      "bootstrap_ci95": {
+        "f1_ci95": [
+          0.616411898971876,
+          0.6391771846998748
+        ],
+        "far_ci95": [
+          0.016666666666666666,
+          0.0625
+        ],
+        "recall_ci95": [
+          0.4513888888888889,
+          0.475
+        ]
+      },
+      "frequency_estimation": {
+        "count": 480,
+        "mae_hz": 46.08718489818352,
+        "median_err_hz": 1.244950698737
+      },
+      "average_op_count_proxy": 21050.9375,
+      "performance_by_case": {
+        "normal": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.0375,
+          "metric": "false_alarm_rate",
+          "value": 0.0375
+        },
+        "frequency_shift": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.15416666666666667,
+          "metric": "recall",
+          "value": 0.15416666666666667
+        },
+        "added_harmonic": {
+          "count": 240,
+          "predicted_anomaly_fraction": 0.2375,
+          "metric": "recall",
+          "value": 0.2375
+        },
+        "impact": {
+          "count": 240,
+          "predicted_anomaly_fraction": 1.0,
+          "metric": "recall",
+          "value": 1.0
+        }
+      },
+      "performance_by_snr": {
+        "30.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.3388888888888889,
+          "f1": 0.5062240663900415,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 0.7692519911020177
+        },
+        "20.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.3388888888888889,
+          "f1": 0.5062240663900415,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 0.7718814500428609
+        },
+        "10.0": {
+          "count": 240,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5,
+          "false_alarm_rate": 0.0,
+          "freq_mae_hz": 20.9794918312574
+        },
+        "0.0": {
+          "count": 240,
+          "precision": 0.9440993788819876,
+          "recall": 0.8444444444444444,
+          "f1": 0.8914956011730204,
+          "false_alarm_rate": 0.15,
+          "freq_mae_hz": 161.82811432033182
+        }
+      }
+    }
+  },
+  "work_accounting_and_savings": {
+    "fixed_low_standalone_ops": 10265.0,
+    "fixed_high_standalone_ops": 29250.0,
+    "adaptive_weighted_ops": 21050.9375,
+    "work_reduction_vs_fixed_high_percent": 28.030982905982903,
+    "escalation_overall": 0.36875,
+    "escalation_by_case": {
+      "normal": 0.1125,
+      "frequency_shift": 0.16666666666666666,
+      "added_harmonic": 0.19583333333333333,
+      "impact": 1.0
+    },
+    "escalation_by_snr": {
+      "30.0": 0.25833333333333336,
+      "20.0": 0.25833333333333336,
+      "10.0": 0.25,
+      "0.0": 0.7083333333333334
+    }
+  }
+}

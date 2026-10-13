@@ -14,7 +14,7 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 | 1. Signal and feature foundation | Done | Generate labelled signals, preserve grouped splits, compute basic features, inspect previews. |
 | 2. Detection and frequency baselines | Done (Pilot) | Define and implement explicit fixed-low and fixed-high rules, calibrated on development data only. |
 | 3. Adaptive selector | Done (Pilot) | Add confidence/uncertainty criteria, escalation stages, and overhead accounting. |
-| 4. Pilot and protocol freeze | Not started | Inspect errors, correct design issues, then freeze thresholds, splits, and metrics before final testing. |
+| 4. Pilot and protocol freeze | Done | Inspect errors, correct design issues, then freeze thresholds, splits, and metrics before final testing. |
 | 5. Full evaluation | Not started | Evaluate held-out cases, robustness across noise, sensitivity to selector thresholds, runtime, operation proxy, and escalation rate. |
 | 6. Wokwi ESP32 demonstration | Not started | Demonstrate firmware decision flow using deterministic simulated or predefined samples. |
 | 7. Research report and presentation | Deferred | Write after implementation and evaluation results are complete. |
@@ -81,16 +81,18 @@ Build and evaluate a context-aware selection policy for acoustic signal analysis
 
 **Acceptance checks:** report detection/frequency quality together with escalation share. Confident cases stop cheaply at stage 1; impacts and out-of-range frequencies escalate reliably; work and runtime recorded separately. Fitted boundaries recorded in `results/phase3_pilot/adaptive_diagnostics.json`.
 
-## Phase 4 — Pilot and protocol freeze
+## Phase 4 — Pilot review and protocol freeze (Done)
 
-Run a small pilot to find implementation and methodological issues. After fixing them, freeze:
+**Completed:**
 
-- Generator ranges and split IDs
-- Feature definitions and detector rules
-- Thresholds and selector settings
-- Evaluation metrics and work model
+- Audited operation-count proxy arithmetic: resolved cumulative vs additional stage accounting.
+  - Stage 1: \(10,265\) ops; Stage 2 additional: \(29,250\) ops; Escalated window cumulative: \(39,515\) ops.
+  - Exact weighted mean verified: \((606 \times 10,265 + 354 \times 39,515) / 960 = 21,050.9375\) ops/window (\(-28.0\%\) vs Fixed-High).
+- Development diagnostic comparison evaluated Fixed-Low, Fixed-High, and Adaptive processing across 960 development windows (with group-level bootstrap 95% CIs) without touching held-out test data.
+- Protocol frozen in versioned human-readable document [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and machine-readable specification [`results/evaluation_protocol.json`](../results/evaluation_protocol.json).
+- Test split protected with strict programmatic guard and hash verification (`b99e0b36ea5b6659`).
 
-Record the frozen configuration before opening the final test results.
+**Acceptance checks:** all Phase 1–4 tests pass; operation-cost arithmetic is consistent; held-out test data remains uninspected and protected from evaluation.
 
 ## Phase 5 — Full evaluation
 

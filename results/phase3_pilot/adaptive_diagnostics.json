@@ -15,12 +15,17 @@
   },
   "overall_development_work_accounting": {
     "total_windows": 960,
+    "stage1_non_escalated_windows": 606,
     "fft_escalations": 354,
     "overall_escalation_rate": 0.36875,
+    "stage1_per_window_ops": 10265,
+    "stage2_additional_ops": 29250,
+    "stage2_cumulative_per_window_ops": 39515,
+    "fixed_low_standalone_ops": 10265,
+    "fixed_high_standalone_ops": 29250,
     "avg_op_count_proxy": 21050.9375,
-    "fixed_low_op_count_proxy": 10265,
-    "fixed_high_op_count_proxy": 29250,
-    "avg_runtime_ms": 0.18049416630674386
+    "ops_formula": "(606 * 10265 + 354 * 39515) / 960 = 21050.9375",
+    "avg_runtime_ms": 0.17559895659360336
   },
   "escalation_by_case": {
     "added_harmonic": {

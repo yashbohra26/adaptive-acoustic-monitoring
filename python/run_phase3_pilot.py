@@ -123,17 +123,19 @@ def run_phase3_pilot(
     overall_escalation_rate = fft_count_overall / len(dev_records)
     avg_ops_adaptive = total_ops_overall / len(dev_records)
 
-    # For comparison, calculate fixed baseline operation counts for N=1024
+    # For comparison, calculate standalone fixed baseline operation counts for N=1024
     n_samples = DEFAULT_CONFIG.samples_per_window
     ops_fixed_low_only = 10 * n_samples + 25
     n_log2_n = int(n_samples * np.log2(n_samples))
     ops_fixed_high_only = int(2.5 * n_log2_n + 3.5 * n_samples + 66)
+    stage2_cumulative_ops = ops_fixed_low_only + ops_fixed_high_only
 
     print(f"\n--- Development Escalation Summary ({len(dev_records)} windows) ---")
     print(f"Overall Escalation Rate: {overall_escalation_rate * 100:.2f}% ({fft_count_overall}/{len(dev_records)})")
-    print(f"Average Operation Count Proxy: {avg_ops_adaptive:.0f}")
-    print(f"  Fixed-Low Baseline Ops: {ops_fixed_low_only} per window")
-    print(f"  Fixed-High Baseline Ops: {ops_fixed_high_only} per window")
+    print(f"Average Operation Count Proxy (Adaptive): {avg_ops_adaptive:.1f}")
+    print(f"  Fixed-Low Standalone Ops: {ops_fixed_low_only} per window")
+    print(f"  Fixed-High Standalone Ops: {ops_fixed_high_only} per window")
+    print(f"  Escalated Window Cumulative Ops (Stage 1 + Stage 2): {stage2_cumulative_ops} per window")
 
     print("\nEscalation Rate by Case:")
     case_summary = {}
@@ -170,11 +172,16 @@ def run_phase3_pilot(
         "selector_boundaries": boundaries,
         "overall_development_work_accounting": {
             "total_windows": len(dev_records),
+            "stage1_non_escalated_windows": len(dev_records) - fft_count_overall,
             "fft_escalations": fft_count_overall,
             "overall_escalation_rate": overall_escalation_rate,
+            "stage1_per_window_ops": ops_fixed_low_only,
+            "stage2_additional_ops": ops_fixed_high_only,
+            "stage2_cumulative_per_window_ops": stage2_cumulative_ops,
+            "fixed_low_standalone_ops": ops_fixed_low_only,
+            "fixed_high_standalone_ops": ops_fixed_high_only,
             "avg_op_count_proxy": avg_ops_adaptive,
-            "fixed_low_op_count_proxy": ops_fixed_low_only,
-            "fixed_high_op_count_proxy": ops_fixed_high_only,
+            "ops_formula": "(606 * 10265 + 354 * 39515) / 960 = 21050.9375",
             "avg_runtime_ms": (total_time_overall / len(dev_records)) * 1000.0,
         },
         "escalation_by_case": case_summary,

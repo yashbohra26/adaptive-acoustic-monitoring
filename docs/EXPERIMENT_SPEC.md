@@ -46,13 +46,17 @@ Frequency-estimation ground truth is meaningful only for stable single-tone norm
      - Else if \(d_{\text{low}}(\mathbf{x}) \ge \tau_{99}\): Stop at Stage 1 as Confidently Anomalous (`confident_anomaly`, label 1, `fft_used=False`).
      - Else (\(\tau_{90} < d_{\text{low}}(\mathbf{x}) < \tau_{99}\)): Escalate to Stage 2 (Fixed-High FFT) due to ambiguous score (`uncertain_score`).
   4. If escalated, the window is processed by Fixed-High, and its calibrated prediction and FFT peak frequency estimate are adopted.
-- **Work accounting:**
+- **Work accounting (Operation-Count Proxy):**
   - `stage_reached`: `"stage1_low"` or `"stage2_high"`.
   - `fft_used`: Boolean indicator recorded for every window.
   - `op_count_proxy`: Operation-count proxy including selector overhead:
-    - Stage 1: \(10 N + 25\) ops (time-domain features + ZCF + robust distance + boundary checks). For \(N=1024\), \(10,265\) ops.
-    - Stage 2: additional \(2.5 N \log_2(N) + 3.5 N + 66\) ops (Hann window + rFFT + 16 band energies + normalization + distance). For \(N=1024\), \(29,250\) total ops.
+    - Stage 1 alone: \(10 N + 25\) ops (\(10,265\) ops for \(N=1024\)).
+    - Fixed-High standalone: \(2.5 N \log_2(N) + 3.5 N + 66\) ops (\(29,250\) ops for \(N=1024\)).
+    - Stage 2 cumulative (escalated window): Stage 1 + Stage 2 = \(10,265 + 29,250 = 39,515\) ops.
+    - Adaptive weighted mean: \((N_{\text{stage1}} \times 10,265 + N_{\text{stage2}} \times 39,515) / N_{\text{total}}\).
+    - For development pilot: \((606 \times 10,265 + 354 \times 39,515) / 960 = 21,050.9\) ops/window (\(-28.0\%\) relative to standalone Fixed-High).
   - Desktop execution time in milliseconds recorded separately from operation counts. Neither represents physical hardware energy.
+- **Protocol Freeze:** Fully specified and frozen in [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and [`results/evaluation_protocol.json`](../results/evaluation_protocol.json).
 
 ### Shared requirements
 
