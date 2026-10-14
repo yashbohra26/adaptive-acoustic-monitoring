@@ -1,0 +1,288 @@
+{
+  "record_type": "CANDIDATE_V1.2_PROVENANCE_AND_BOOTSTRAP_UNCERTAINTY",
+  "description": "Comprehensive provenance, canonical data hashing, and bootstrap confidence intervals for Candidate v1.2 independent holdout evaluation.",
+  "historical_frozen_artifact": "results/candidate_v1.2_independent_evaluation.json",
+  "reproduction_windows_artifact": "results/candidate_v1.2_reproduced_windows.csv",
+  "signal_generation": {
+    "dataset_purpose": "Independent held-out evaluation for Candidate v1.2",
+    "seed": 20261014,
+    "sample_rate_hz": 4000,
+    "duration_s": 0.256,
+    "samples_per_window": 1024,
+    "snr_db_levels": [
+      30.0,
+      20.0,
+      10.0,
+      0.0
+    ],
+    "normal_frequency_range_hz": [
+      180.0,
+      260.0
+    ],
+    "shift_ratio_range": [
+      1.35,
+      1.6
+    ],
+    "impact_decay_s": 0.009,
+    "impact_carrier_range_hz": [
+      500.0,
+      900.0
+    ],
+    "total_windows": 320,
+    "total_groups": 20,
+    "group_ids": [
+      "g0000",
+      "g0001",
+      "g0002",
+      "g0003",
+      "g0004",
+      "g0005",
+      "g0006",
+      "g0007",
+      "g0008",
+      "g0009",
+      "g0010",
+      "g0011",
+      "g0012",
+      "g0013",
+      "g0014",
+      "g0015",
+      "g0016",
+      "g0017",
+      "g0018",
+      "g0019"
+    ],
+    "composition_by_case": {
+      "normal": 80,
+      "frequency_shift": 80,
+      "added_harmonic": 80,
+      "impact": 80
+    },
+    "composition_by_snr": {
+      "30.0": 80,
+      "20.0": 80,
+      "10.0": 80,
+      "0.0": 80
+    },
+    "eval_legacy_group_names_hash_sha256": "5b9189274f9dc2853b485673b8793027d2bbe22d7bb51512f1a3b52967b45454",
+    "eval_canonical_content_hash_sha256": "962643581c21c335677cc41418e21c0bbb07acc14cdf0ad1356eee373d2446ac"
+  },
+  "model_parameters": {
+    "protocol_version": "1.2.0",
+    "fixed_high_threshold": 55.309465532998374,
+    "candidate_v1.2_boundaries": {
+      "low_score_p_normal": 1.3110276209459872,
+      "low_score_p_anomaly": 7.140502430084831,
+      "zcf_min": 173.59375,
+      "zcf_max": 263.90625
+    }
+  },
+  "bootstrap_uncertainty_95ci": {
+    "fixed_low": {
+      "f1": {
+        "mean": 0.5413276452801723,
+        "std": 0.01108257567208217,
+        "ci_95": [
+          0.5196374622356495,
+          0.5637982195845697
+        ]
+      },
+      "recall": {
+        "mean": 0.3789125,
+        "std": 0.010377659465034604,
+        "ci_95": [
+          0.35833333333333334,
+          0.4
+        ]
+      },
+      "precision": {
+        "mean": 0.9481945928820357,
+        "std": 0.018905332840694098,
+        "ci_95": [
+          0.9090909090909091,
+          0.979381443298969
+        ]
+      },
+      "false_alarm_rate": {
+        "mean": 0.062575,
+        "std": 0.02407009295785955,
+        "ci_95": [
+          0.025,
+          0.1125
+        ]
+      },
+      "avg_ops": {
+        "mean": 10265.0,
+        "std": 0.0,
+        "ci_95": [
+          10265.0,
+          10265.0
+        ]
+      },
+      "savings": {
+        "mean": 64.90598290598291,
+        "std": 0.0,
+        "ci_95": [
+          64.90598290598291,
+          64.90598290598291
+        ]
+      }
+    },
+    "fixed_high": {
+      "f1": {
+        "mean": 0.9531147187413299,
+        "std": 0.013949077905658386,
+        "ci_95": [
+          0.9230684326710816,
+          0.979253112033195
+        ]
+      },
+      "recall": {
+        "mean": 0.937475,
+        "std": 0.028067986657400276,
+        "ci_95": [
+          0.8791666666666667,
+          0.9833333333333333
+        ]
+      },
+      "precision": {
+        "mean": 0.9698466824988716,
+        "std": 0.008629338013350628,
+        "ci_95": [
+          0.9533898305084746,
+          0.986608630952381
+        ]
+      },
+      "false_alarm_rate": {
+        "mean": 0.0879,
+        "std": 0.026718953946590053,
+        "ci_95": [
+          0.0375,
+          0.1375
+        ]
+      },
+      "avg_ops": {
+        "mean": 29250.0,
+        "std": 0.0,
+        "ci_95": [
+          29250.0,
+          29250.0
+        ]
+      },
+      "savings": {
+        "mean": 0.0,
+        "std": 0.0,
+        "ci_95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "candidate_v1.1": {
+      "f1": {
+        "mean": 0.9044165759458895,
+        "std": 0.013632638530604119,
+        "ci_95": [
+          0.8767123287671234,
+          0.9324618736383442
+        ]
+      },
+      "recall": {
+        "mean": 0.8499916666666667,
+        "std": 0.024548703009414665,
+        "ci_95": [
+          0.8041666666666667,
+          0.8958333333333334
+        ]
+      },
+      "precision": {
+        "mean": 0.9668333606251257,
+        "std": 0.009544613786413728,
+        "ci_95": [
+          0.9485981308411215,
+          0.9853676296471703
+        ]
+      },
+      "false_alarm_rate": {
+        "mean": 0.0879,
+        "std": 0.026718953946590053,
+        "ci_95": [
+          0.0375,
+          0.1375
+        ]
+      },
+      "avg_ops": {
+        "mean": 26173.8921875,
+        "std": 492.44037903268605,
+        "ci_95": [
+          25255.625,
+          27083.75
+        ]
+      },
+      "savings": {
+        "mean": 10.516607905982909,
+        "std": 1.6835568513937982,
+        "ci_95": [
+          7.405982905982906,
+          13.655982905982905
+        ]
+      }
+    },
+    "candidate_v1.2": {
+      "f1": {
+        "mean": 0.9531147187413299,
+        "std": 0.013949077905658386,
+        "ci_95": [
+          0.9230684326710816,
+          0.979253112033195
+        ]
+      },
+      "recall": {
+        "mean": 0.937475,
+        "std": 0.028067986657400276,
+        "ci_95": [
+          0.8791666666666667,
+          0.9833333333333333
+        ]
+      },
+      "precision": {
+        "mean": 0.9698466824988716,
+        "std": 0.008629338013350628,
+        "ci_95": [
+          0.9533898305084746,
+          0.986608630952381
+        ]
+      },
+      "false_alarm_rate": {
+        "mean": 0.0879,
+        "std": 0.026718953946590053,
+        "ci_95": [
+          0.0375,
+          0.1375
+        ]
+      },
+      "avg_ops": {
+        "mean": 28717.63671875,
+        "std": 477.25421263812325,
+        "ci_95": [
+          27815.0,
+          29734.53125
+        ]
+      },
+      "savings": {
+        "mean": 1.8200454059829063,
+        "std": 1.6316383338055496,
+        "ci_95": [
+          -1.6565170940170941,
+          4.905982905982905
+        ]
+      }
+    }
+  },
+  "scientific_disclaimers": [
+    "All signals are synthetically generated under controlled Python waveform definitions.",
+    "Group-level bootstrap confidence intervals characterize sampling variability across the 20 synthetic source groups; they do not constitute real-world industrial machine validation.",
+    "Operation counts represent an algorithmic proxy; they do not represent physical microcontroller (ESP32) electrical power or battery life.",
+    "Candidate v1.2 results are evaluated on an independent holdout (seed 20261014) and are not combined with Phase 5 held-out test data (seed 20261013)."
+  ]
+}

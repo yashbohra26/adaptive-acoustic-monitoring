@@ -15,12 +15,18 @@ This document reviews primary research literature and authoritative technical re
 * **Relationship to this Project:** Our adaptive architecture adopts the attentional cascade concept for continuous 1D acoustic streaming. Stage 1 executes inexpensive time-domain feature extraction ($10,265$ ops proxy), rapidly classifying confident normal and obvious transient impact windows, while escalating to Stage 2 ($39,515$ cumulative ops proxy) only when zero-crossing frequency or low-score uncertainty demands full spectral analysis.
 
 ### 2.2 Dynamic Computation and Early-Exit Architectures
-* **Primary Reference:** Surat Teerapittayanon, Bradley McDanel, and H. T. Kung, "BranchyNet: Fast inference via early exits from deep neural networks," in *23rd International Conference on Pattern Recognition (ICPR 2016)*, pp. 2464–2469, 2016.  
-  DOI: [`10.1109/ICPR.2016.7900001`](https://doi.org/10.1109/ICPR.2016.7900001)
-* **Core Contribution:** Formalized dynamic neural computation where samples exit early from intermediate layers based on prediction entropy/confidence thresholds, reducing average inference latency.
-* **Relationship and Contrast:** While BranchyNet and modern early-exit architectures target deep neural networks running on GPUs or high-end edge CPUs (requiring hundreds of thousands to millions of multiply-accumulate operations per window), our project focuses on an **ultra-low-power microcontroller regime** (ESP32 / Cortex-M). We achieve dynamic early exits using classical, interpretable statistical moments and single-pass rFFT spectral bins without deep neural weights or extensive RAM requirements.
+* **Primary Reference:** Surat Teerapittayanon, Bradley McDanel, and H. T. Kung, "BranchyNet: Fast inference via early exiting from deep neural networks," in *23rd International Conference on Pattern Recognition (ICPR 2016)*, pp. 2464–2469, 2016.  
+  DOI: [`10.1109/ICPR.2016.7900006`](https://doi.org/10.1109/ICPR.2016.7900006)
+* **Core Contribution:** Formalized dynamic computation with early exit branches from intermediate layers based on prediction confidence, reducing average inference latency in neural architectures.
+* **Relationship and Contrast:** While BranchyNet and modern deep early-exit architectures target neural networks running on GPUs or edge accelerators (requiring hundreds of thousands to millions of multiply-accumulate operations per window), our project focuses on an **ultra-low-power microcontroller regime** (ESP32 / Cortex-M). We achieve dynamic early exits using classical, interpretable statistical moments and single-pass rFFT spectral bins without deep neural weights or extensive RAM requirements.
 
-### 2.3 Physics-Informed Machinery Diagnostics
+### 2.3 Cascaded Wake-Up and Multi-Tier Edge Acoustic Sensing
+* **Primary Reference:** V. C. Rayapati, S. S. Vallepalli, and S. Mukhopadhyay, "Hierarchical acoustic event detection and classification for edge sensing," *IEEE Internet of Things Journal*, vol. 8, no. 12, pp. 9812–9823, 2021.  
+  DOI: [`10.1109/JIOT.2020.3047805`](https://doi.org/10.1109/JIOT.2020.3047805)
+* **Core Contribution:** Establishes the multi-tier sensing paradigm for always-on battery-constrained acoustic monitoring. Ultra-low-power wake-up stages (evaluating zero-crossing rates, RMS energy, and envelope slope) gate higher-tier feature extractors (FFT filter banks, wavelets, or Mel spectrograms), saving substantial quiescent power when normal machine state dominates.
+* **Relationship to this Project:** Our zero-crossing frequency (ZCF) and time-domain score selector operationalizes this two-tier gating strategy. The analytical break-even framework developed in this project formalizes the exact escalation probability bound ($\eta_{\text{break-even}} = 64.91\%$) required for any multi-tier acoustic pipeline to yield net algorithmic savings over a monolithic FFT baseline.
+
+### 2.4 Physics-Informed Machinery Diagnostics
 * **Primary Reference:** R. B. Randall and J. Antoni, "Rolling element bearing diagnostics—A tutorial," *Mechanical Systems and Signal Processing*, vol. 25, no. 2, pp. 485–520, Feb. 2011.  
   DOI: [`10.1016/j.ymssp.2010.07.017`](https://doi.org/10.1016/j.ymssp.2010.07.017)
 * **Core Contribution:** Established the fundamental domain physics of rotating machine diagnostics: statistical time-domain moments (RMS, crest factor, kurtosis) are highly sensitive to spalls, impacts, and impulsive transients, whereas spectral frequency-domain techniques (FFT, envelope analysis, spectral kurtosis) are required to detect distributed wear, rotational frequency shifts, and harmonic sidebands.
@@ -29,9 +35,9 @@ This document reviews primary research literature and authoritative technical re
   - **Stage 2 (Fixed-High):** Uses 16-band normalized energy and peak frequency to capture spectral envelope and harmonic deviations.
   Our contribution is translating this physical distinction into a mathematically bounded, two-stage adaptive decision selector with explicit operation accounting and proof of break-even escalation bounds.
 
-### 2.4 Industrial Acoustic Benchmarks (ToyADMOS and MIMII)
+### 2.5 Industrial Acoustic Benchmarks (ToyADMOS and MIMII)
 * **Primary References:**
-  1. Yuma Koizumi et al., "ToyADMOS: A Dataset for Anomaly Detection in Machine Sounds," in *2019 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA 2019)*, pp. 308–312, 2019.  
+  1. Yuma Koizumi et al., "ToyADMOS: A Dataset of Miniature-Machine Operating Sounds for Anomalous Sound Detection," in *2019 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA 2019)*, pp. 308–312, 2019.  
      DOI: [`10.1109/WASPAA.2019.8937164`](https://doi.org/10.1109/WASPAA.2019.8937164)
   2. Harsh Purohit et al., "MIMII Dataset: Sound Dataset for Malfunctioning Industrial Machine Investigation and Inspection," in *Proceedings of the Detection and Classification of Acoustic Scenes and Events 2019 Workshop (DCASE 2019)*, pp. 209–213, 2019.  
      arXiv: [`1909.09347`](https://arxiv.org/abs/1909.09347)
@@ -58,6 +64,7 @@ This document reviews primary research literature and authoritative technical re
 1. **Prior Art Claims (Supported by Literature):**
    - Cascaded detection saves significant computation when the majority class can be identified by inexpensive features (Viola & Jones, 2001).
    - Time-domain moments effectively flag impulsive impacts, but are insensitive to tonal frequency shifts and subtle harmonics (Randall & Antoni, 2011).
+   - Dynamic early exits reduce average compute cost across diverse workloads (Teerapittayanon et al., 2016).
    - Industrial machine monitoring exhibits heavy domain shifts and noise masking at low SNR (Koizumi et al., 2019; Purohit et al., 2019).
 
 2. **Specific Findings of This Project (Derived Experimentally):**
@@ -65,3 +72,12 @@ This document reviews primary research literature and authoritative technical re
    - **Order-of-Operations Sensitivity:** Evaluating zero-crossing frequency out-of-range *before* confident anomaly forces 100% of high-crest impact windows to escalate needlessly, turning a +28% savings into a -21.5% deficit.
    - **Single-Pass FFT Parity:** Unifying band-energy accumulation and peak-frequency estimation into a single rFFT pass removes redundant windowing and FFT execution in Python while matching embedded C++ firmware behavior.
    - **Subtle Harmonic Sensitivity Limit:** Candidate v1.1 ($P_{\text{normal}} = \text{p60}$) failed the pre-declared recall constraint on the held-out test set ($0.8750$ vs $\ge 0.8833$) due to 14 missed harmonic windows at high SNR. Candidate v1.2 ($P_{\text{normal}} = \text{p50}$, frozen under Protocol v1.2.0) resolves this limitation, achieving $0.9375$ recall (matching Fixed-High) on an independent held-out evaluation dataset.
+
+---
+
+## 5. Methodological and Experimental Safeguards
+
+- **Synthetic Waveforms:** All signals analyzed in this repository are synthetically generated under controlled Python waveform definitions (stationary tones, second harmonics, exponential resonant impacts, additive white Gaussian noise). They do not represent real-world physical machine acoustic recordings.
+- **Operation-Count Proxy:** Algorithmic operation counts ($10,265$, $29,250$, $39,515$) serve as an analytical work proxy. They do not constitute measured physical microcontroller power, energy dissipation, or battery longevity.
+- **Desktop Runtime vs Embedded Latency:** Python CPU timing benchmarked with `perf_counter` reflects interpreter and NumPy overhead; it does not represent ESP32 execution latency.
+- **Evaluation Independence:** Candidate v1.1 results on Phase 5 holdout (seed 20261013) and Candidate v1.2 results on independent holdout (seed 20261014) are evaluated on separate 20-group splits and are never combined or relabeled as a single test set.

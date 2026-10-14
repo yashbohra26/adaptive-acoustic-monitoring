@@ -20,7 +20,9 @@ void printBanner() {
     Serial.println();
     Serial.println("================================================================================");
     Serial.println("     ESP32 Adaptive Acoustic Anomaly Monitor - Firmware Demonstration           ");
-    Serial.println("     Protocol v1.1.0 (Candidate Selector: cand_v1.1_p60_anomaly_first)          ");
+    Serial.println("     Active Configuration: Candidate Selector v1.1 (Protocol v1.1.0)           ");
+    Serial.println("     NOTE: Vector 4 (added harmonic) Stage 1 miss is intentional in v1.1.       ");
+    Serial.println("     (Candidate Selector v1.2 configuration available in adaptive_core_v1_2.h)  ");
     Serial.println("================================================================================");
     Serial.println("Frozen Calibration Boundaries (Development Partition):");
     Serial.print("  P_ANOMALY (Stage 1 Anomaly Threshold) : "); Serial.println(AdaptiveMonitoring::P_ANOMALY, 4);

@@ -76,7 +76,9 @@ adaptive-acoustic-monitoring/
 │   ├── candidate_selector.py
 │   ├── benchmark_methods.py
 │   ├── investigate_difficult_cases.py
+│   ├── verify_v1_2_provenance.py
 │   ├── plot_evaluation_results.py
+│   ├── plot_v1_2_results.py
 │   ├── run_phase2_pilot.py
 │   ├── run_phase3_pilot.py
 │   ├── run_phase4_review.py
@@ -93,6 +95,7 @@ adaptive-acoustic-monitoring/
 │   └── src/
 │       ├── main.cpp
 │       ├── adaptive_core.h
+│       ├── adaptive_core_v1_2.h
 │       └── demo_vectors.h
 ├── results/
 │   ├── figures/
@@ -100,10 +103,16 @@ adaptive-acoustic-monitoring/
 │   │   ├── fig2_work_and_runtime.png / .pdf
 │   │   ├── fig3_case_and_snr_recall.png / .pdf
 │   │   ├── fig4_adaptive_escalation.png / .pdf
-│   │   └── fig5_error_breakdown.png / .pdf
+│   │   ├── fig5_error_breakdown.png / .pdf
+│   │   ├── fig1_v1_2_independent_performance.png / .pdf
+│   │   ├── fig2_v1_2_work_and_escalation.png / .pdf
+│   │   └── fig3_v1_2_case_and_snr_breakdown.png / .pdf
 │   ├── tables/
 │   │   ├── overall_performance_table.md / .csv
-│   │   └── case_breakdown_table.md / .csv
+│   │   ├── case_breakdown_table.md / .csv
+│   │   ├── v1_2_overall_performance_table.md / .csv
+│   │   ├── v1_2_case_breakdown_table.md / .csv
+│   │   └── v1_2_snr_breakdown_table.md / .csv
 │   ├── preview/
 │   ├── phase2_pilot/
 │   ├── phase3_pilot/
@@ -117,7 +126,9 @@ adaptive-acoustic-monitoring/
 │   ├── benchmark_fair_evaluation.json
 │   ├── benchmark_fair_windows.csv
 │   ├── candidate_v1.2_development_study.json
-│   └── candidate_v1.2_independent_evaluation.json
+│   ├── candidate_v1.2_independent_evaluation.json
+│   ├── candidate_v1.2_provenance_and_uncertainty.json
+│   └── candidate_v1.2_reproduced_windows.csv
 ├── tests/
 │   ├── test_phase1.py
 │   ├── test_phase2.py

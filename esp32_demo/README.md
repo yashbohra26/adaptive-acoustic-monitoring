@@ -1,7 +1,9 @@
 # ESP32 Embedded Adaptive Acoustic Monitoring Demo (Wokwi)
 
 > **Phase:** Phase 6 — Firmware Decision-Flow Demonstration  
-> **Status:** Software-Only Port of Frozen Candidate Selector v1.1 (`cand_v1.1_p60_anomaly_first`)  
+> **Status:** Software-Only Desktop Parity Verified (100% pass on GCC); Interactive Wokwi Simulation Pending Manual Run  
+> **Default Configuration:** Frozen Candidate Selector v1.1 (`cand_v1.1_p60_anomaly_first`, `esp32_demo/src/adaptive_core.h`)  
+> **Alternative Configuration:** Candidate Selector v1.2 (`esp32_demo/src/adaptive_core_v1_2.h`)  
 > **Target Hardware:** ESP32 (simulated via Wokwi / ESP32-WROOM-32)  
 > **Signal Source:** Deterministic development vectors from Group `g0001` (zero held-out test data used)
 
@@ -9,13 +11,14 @@
 
 ## 1. Overview and Purpose
 
-This module provides a self-contained embedded C++ implementation of the **frozen Candidate Selector v1.1** decision logic, demonstrating how the adaptive two-stage cascade executes on a resource-constrained microcontroller (ESP32).
+This module provides a self-contained embedded C++ implementation of the **frozen Candidate Selector v1.1** decision logic (with Candidate v1.2 configuration also available in `src/adaptive_core_v1_2.h`), demonstrating how the adaptive two-stage cascade executes on a resource-constrained microcontroller (ESP32).
 
 ### Key Demonstration Goals:
-1. **Faithful Protocol v1.1.0 Port:** Implements the exact decision hierarchy and calibration constants from `results/evaluation_protocol_v1.1.json`.
+1. **Faithful Protocol v1.1.0 Port (Default):** Implements the exact decision hierarchy and calibration constants from `results/evaluation_protocol_v1.1.json`.
 2. **Early-Stop Execution:** Shows that obvious time-domain anomalies (e.g., impacts) and confident normal signals stop cheaply at Stage 1 ($10,265$ ops proxy), avoiding unnecessary FFT calculations.
 3. **Selective FFT Escalation:** Shows that frequency shifts and ambiguous signals reliably escalate to Stage 2 ($39,515$ ops cumulative proxy).
-4. **Zero Test Data Leakage:** Evaluated exclusively on deterministic development signals from Group `g0001`.
+4. **Transparent Trade-Off Demonstration:** Demonstrates why Candidate v1.1 missed subtle added harmonics (Vector 4), and verifies how Candidate v1.2 recovers detection by recalibrating $P_{\text{normal}} = 1.311028$ (50th percentile).
+5. **Zero Test Data Leakage:** Evaluated exclusively on deterministic development signals from Group `g0001`.
 
 ---
 
@@ -95,11 +98,17 @@ g++ -std=c++11 -O2 -I esp32_demo esp32_demo/test_harness.cpp -o esp32_demo/test_
 
 ## 5. Python / C++ Parity Audit
 
-The C++ port was verified against Python float64 ground truth:
-- **Predicted Labels:** 5/5 identical (100% parity).
-- **Stage Reached:** 5/5 identical (100% parity).
-- **Escalation Reasons:** 5/5 identical (100% parity).
-- **Operation Count Proxy:** 5/5 identical (100% parity).
+The desktop C++ harness (`esp32_demo/test_harness.cpp`) was executed and verified against Python float64 ground truth:
+- **Candidate v1.1 (Protocol v1.1.0):**
+  - Predicted Labels: 5/5 identical (100% parity, including intentional Vector 4 harmonic miss).
+  - Stage Reached: 5/5 identical (100% parity).
+  - Escalation Reasons: 5/5 identical (100% parity).
+  - Operation Count Proxy: 5/5 identical (100% parity).
+- **Candidate v1.2 (`adaptive_core_v1_2.h`):**
+  - Predicted Labels: 5/5 identical (100% parity, with Vector 4 successfully escalating to Stage 2 FFT and flagged Anomaly).
+  - Stage Reached: 5/5 identical (100% parity).
+  - Escalation Reasons: 5/5 identical (100% parity).
+  - Operation Count Proxy: 5/5 identical (100% parity).
 - **Score Tolerances:** Low-stage and high-stage anomaly scores agree within $\pm 0.001$ float32 numerical rounding tolerance.
 
 ---

@@ -216,3 +216,102 @@ def test_quality_constraints_audit_accurate_reporting():
         f"Expected Candidate v1.1 recall constraint to be NOT MET on Phase 5 test set. "
         f"Recall was {m_v11['recall']:.4f}, target was {recall_target:.4f}"
     )
+
+
+def test_protocol_v1_2_structure_and_constants():
+    """Verify Protocol v1.2.0 pre-test freeze artifact structure and frozen parameters."""
+    protocol_path = Path("results/evaluation_protocol_v1.2.json")
+    assert protocol_path.exists(), "Protocol v1.2 freeze artifact missing!"
+
+    with protocol_path.open("r", encoding="utf-8") as f:
+        proto = json.load(f)
+
+    assert proto["protocol_version"] == "1.2.0"
+    assert "candidate_v1.2" in proto
+    cand = proto["candidate_v1.2"]
+    assert cand["p_normal_percentile"] == 50.0
+    assert cand["p_anomaly_multiplier"] == 1.2
+    assert cand["stage1_ops"] == 10265
+    assert cand["stage2_cumulative_ops"] == 39515
+
+    bounds = cand["frozen_boundaries"]
+    assert bounds["low_score_p_normal"] > 0.0
+    assert bounds["low_score_p_anomaly"] > bounds["low_score_p_normal"]
+    assert 150.0 < bounds["zcf_min"] < 200.0
+    assert 240.0 < bounds["zcf_max"] < 300.0
+
+
+def test_candidate_v1_2_frozen_metrics_reproduce():
+    """Verify Candidate v1.2 independent evaluation metrics match the recorded artifact."""
+    artifact_path = Path("results/candidate_v1.2_independent_evaluation.json")
+    assert artifact_path.exists(), "Candidate v1.2 independent evaluation artifact missing!"
+
+    with artifact_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    assert data["status"] == "INDEPENDENT_HOLDOUT_EVALUATION_COMPLETE"
+    assert data["protocol_version"] == "1.2.0"
+    assert data["eval_seed"] == 20261014
+    assert data["eval_windows"] == 320
+    assert "methods" in data
+
+    m_v12 = data["methods"]["candidate_v1.2"]["metrics"]
+    assert np.isclose(m_v12["f1"], 0.9533898305084746)
+    assert np.isclose(m_v12["recall"], 0.9375)
+    assert np.isclose(m_v12["precision"], 0.9698275862068966)
+    assert np.isclose(m_v12["false_alarm_rate"], 0.0875)
+    assert m_v12["tp"] == 225
+    assert m_v12["fp"] == 7
+    assert m_v12["tn"] == 73
+    assert m_v12["fn"] == 15
+    assert np.isclose(data["methods"]["candidate_v1.2"]["avg_op_count_proxy"], 28729.0625)
+
+    # Candidate v1.1 on the same independent evaluation
+    m_v11 = data["methods"]["candidate_v1.1"]["metrics"]
+    assert np.isclose(m_v11["f1"], 0.9046563192904656)
+    assert np.isclose(m_v11["recall"], 0.85)
+
+
+def test_candidate_v1_2_quality_status_computation():
+    """Verify that Candidate v1.2 quality constraint status is accurately computed from saved metrics.
+
+    Checks:
+    1. Candidate v1.2 meets F1, Recall, FAR, and Ops constraints relative to Fixed-High.
+    2. Candidate v1.1 on this independent holdout FAILS the recall constraint, exactly
+       as recorded in the artifact ('NO (Rec:0.850 vs 0.887)').
+    """
+    artifact_path = Path("results/candidate_v1.2_independent_evaluation.json")
+    with artifact_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    m_high = data["methods"]["fixed_high"]["metrics"]
+    m_v12 = data["methods"]["candidate_v1.2"]["metrics"]
+    ops_v12 = data["methods"]["candidate_v1.2"]["avg_op_count_proxy"]
+
+    m_v11 = data["methods"]["candidate_v1.1"]["metrics"]
+
+    # Candidate v1.2 constraints relative to Fixed-High
+    f1_target = m_high["f1"] - 0.05
+    rec_target = m_high["recall"] - 0.05
+    far_target = m_high["false_alarm_rate"] + 0.01
+
+    v12_meets_f1 = m_v12["f1"] >= f1_target
+    v12_meets_rec = m_v12["recall"] >= rec_target
+    v12_meets_far = m_v12["false_alarm_rate"] <= far_target
+    v12_meets_ops = ops_v12 < 29250.0
+
+    assert v12_meets_f1, f"v1.2 F1 constraint failed: {m_v12['f1']} < {f1_target}"
+    assert v12_meets_rec, f"v1.2 Recall constraint failed: {m_v12['recall']} < {rec_target}"
+    assert v12_meets_far, f"v1.2 FAR constraint failed: {m_v12['false_alarm_rate']} > {far_target}"
+    assert v12_meets_ops, f"v1.2 Ops constraint failed: {ops_v12} >= 29250.0"
+
+    assert data["methods"]["candidate_v1.2"]["meets_quality_constraints"] == "YES"
+
+    # Candidate v1.1 on this evaluation fails recall
+    v11_meets_rec = m_v11["recall"] >= rec_target
+    assert not v11_meets_rec, (
+        f"Expected Candidate v1.1 to fail recall on independent holdout: "
+        f"recall was {m_v11['recall']:.4f}, target was {rec_target:.4f}"
+    )
+    assert "NO (Rec:0.850 vs 0.887)" in data["methods"]["candidate_v1.1"]["meets_quality_constraints"]
+
