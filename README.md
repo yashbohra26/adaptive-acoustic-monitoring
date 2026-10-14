@@ -34,7 +34,7 @@ This is a hypothesis to test, not a result we assume in advance. Simulation resu
 - [Phase 2–5 evaluation runners](python/): reproducible pipelines for pilots, development review, CV studies, and final test evaluation.
 - [ESP32 demonstration](esp32_demo/): pure C++ embedded decision flow with 100% desktop parity; Wokwi platform configuration and demo vectors.
 - [Literature review](docs/PRIOR_ART.md): formal prior art review covering Viola-Jones cascades, BranchyNet early-exits, and Randall-Antoni machinery diagnostics.
-- [Automated quality constraints](tests/test_quality_constraints.py): 39 comprehensive unit tests verifying zero duplicate FFTs, cost accounting, split disjointness, and constraint reporting.
+- [Automated quality constraints](tests/test_quality_constraints.py): Automated unit test suite verifying zero duplicate FFTs, cost accounting, split disjointness, and constraint reporting across all phases.
 
 ## Run the current signal-generation milestone
 
