@@ -8,6 +8,11 @@ documenting Candidate v1.2 performance, work, and uncertainty on the independent
 4. results/tables/v1_2_overall_performance_table.md / .csv
 5. results/tables/v1_2_case_breakdown_table.md / .csv
 6. results/tables/v1_2_snr_breakdown_table.md / .csv
+
+CRITICAL SCIENTIFIC PRACTICE:
+- Headline values represent observed evaluation point estimates from candidate_v1.2_independent_evaluation.json.
+- Group-level bootstrap intervals from candidate_v1.2_provenance_and_uncertainty.json are clearly labeled as 95% CIs.
+- Explicitly states that observed savings are positive (+1.78%), but the 95% group-bootstrap CI is [-1.66%, +4.91%], which spans zero.
 """
 from __future__ import annotations
 
@@ -36,8 +41,8 @@ def set_plot_style():
     })
 
 
-def plot_v1_2_performance_with_cis(prov_data: dict, out_dir: Path):
-    """Plot F1, Precision, Recall, and False-Alarm Rate with 95% bootstrap CIs."""
+def plot_v1_2_performance_with_cis(obs_data: dict, prov_data: dict, out_dir: Path):
+    """Plot observed point estimates for F1, Precision, Recall, and FAR with 95% bootstrap CIs."""
     methods = ["fixed_low", "fixed_high", "candidate_v1.1", "candidate_v1.2"]
     labels = ["Fixed-Low", "Fixed-High", "Candidate v1.1\n(frozen)", "Candidate v1.2\n(improved)"]
     colors = ["#2b5c8f", "#d95f02", "#7570b3", "#1b9e77"]
@@ -50,12 +55,18 @@ def plot_v1_2_performance_with_cis(prov_data: dict, out_dir: Path):
 
     for ax_idx, (m_key, title) in enumerate(zip(metrics, metric_titles)):
         ax = axes[ax_idx]
-        means = [ci_data[m][m_key]["mean"] for m in methods]
-        yerr_low = [means[i] - ci_data[methods[i]][m_key]["ci_95"][0] for i in range(len(methods))]
-        yerr_high = [ci_data[methods[i]][m_key]["ci_95"][1] - means[i] for i in range(len(methods))]
+        # Observed point estimates from independent evaluation
+        obs_vals = [obs_data["methods"][m]["metrics"][m_key] for m in methods]
+
+        # Asymmetric error bars relative to observed value
+        yerr_low = [obs_vals[i] - ci_data[methods[i]][m_key]["ci_95"][0] for i in range(len(methods))]
+        yerr_high = [ci_data[methods[i]][m_key]["ci_95"][1] - obs_vals[i] for i in range(len(methods))]
+        # Clip negative error bar offsets if bootstrap percentile slightly exceeds point estimate due to asymmetry
+        yerr_low = [max(0.0, y) for y in yerr_low]
+        yerr_high = [max(0.0, y) for y in yerr_high]
         yerr = [yerr_low, yerr_high]
 
-        bars = ax.bar(labels, means, yerr=yerr, capsize=4, color=colors, alpha=0.85,
+        bars = ax.bar(labels, obs_vals, yerr=yerr, capsize=4, color=colors, alpha=0.85,
                       edgecolor="black", linewidth=0.8, error_kw={"elinewidth": 1.2, "ecolor": "black"})
 
         ax.set_title(title, fontweight="bold")
@@ -63,52 +74,50 @@ def plot_v1_2_performance_with_cis(prov_data: dict, out_dir: Path):
         ax.set_xticks(range(len(labels)))
         ax.set_xticklabels(labels, rotation=20, ha="right")
 
-        for bar in bars:
-            height = bar.get_height()
-            ax.annotate(f"{height:.3f}",
-                        xy=(bar.get_x() + bar.get_width() / 2, height),
+        for bar, val in zip(bars, obs_vals):
+            ax.annotate(f"{val:.3f}",
+                        xy=(bar.get_x() + bar.get_width() / 2, val),
                         xytext=(0, 10 if m_key == "false_alarm_rate" else 8),
                         textcoords="offset points",
-                        ha="center", va="bottom", fontsize=8)
+                        ha="center", va="bottom", fontsize=8, fontweight="bold")
 
     plt.tight_layout()
     fig.savefig(out_dir / "fig1_v1_2_independent_performance.png", dpi=300)
     fig.savefig(out_dir / "fig1_v1_2_independent_performance.pdf")
     plt.close(fig)
-    print("Generated Figure 1: Candidate v1.2 Independent Performance with Bootstrap CIs.")
+    print("Generated Figure 1: Candidate v1.2 Observed Point Estimates with 95% Bootstrap CIs.")
 
 
-def plot_v1_2_work_and_escalation(prov_data: dict, df: pd.DataFrame, out_dir: Path):
-    """Dual-panel: Algorithmic Work (Ops proxy with 95% CI) and Escalation Rates."""
+def plot_v1_2_work_and_escalation(obs_data: dict, prov_data: dict, df: pd.DataFrame, out_dir: Path):
+    """Dual-panel: Observed Algorithmic Work (Ops proxy with 95% CI) and Escalation Rates."""
     methods = ["fixed_low", "fixed_high", "candidate_v1.1", "candidate_v1.2"]
     labels = ["Fixed-Low", "Fixed-High", "Candidate v1.1\n(frozen)", "Candidate v1.2\n(improved)"]
     colors = ["#2b5c8f", "#d95f02", "#7570b3", "#1b9e77"]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.2))
 
-    # Panel 1: Algorithmic Work Proxy with 95% bootstrap CI
+    # Panel 1: Observed Algorithmic Work Proxy with 95% bootstrap CI
     ci_data = prov_data["bootstrap_uncertainty_95ci"]
-    ops_means = [ci_data[m]["avg_ops"]["mean"] for m in methods]
-    yerr_low = [ops_means[i] - ci_data[methods[i]][avg_ops_key]["ci_95"][0] for i, avg_ops_key in enumerate(["avg_ops"] * len(methods))]
-    yerr_high = [ci_data[methods[i]]["avg_ops"]["ci_95"][1] - ops_means[i] for i in range(len(methods))]
+    obs_ops = [obs_data["methods"][m]["avg_op_count_proxy"] for m in methods]
+    yerr_low = [max(0.0, obs_ops[i] - ci_data[methods[i]]["avg_ops"]["ci_95"][0]) for i in range(len(methods))]
+    yerr_high = [max(0.0, ci_data[methods[i]]["avg_ops"]["ci_95"][1] - obs_ops[i]) for i in range(len(methods))]
     yerr = [yerr_low, yerr_high]
 
-    bars1 = ax1.bar(labels, ops_means, yerr=yerr, capsize=4, color=colors, alpha=0.85,
+    bars1 = ax1.bar(labels, obs_ops, yerr=yerr, capsize=4, color=colors, alpha=0.85,
                     edgecolor="black", linewidth=0.8, error_kw={"elinewidth": 1.2, "ecolor": "black"})
-    ax1.axhline(29250, color="#d95f02", linestyle=":", linewidth=1.5, label="Fixed-High Reference (29,250)")
+    ax1.axhline(29250, color="#d95f02", linestyle=":", linewidth=1.5, label="Fixed-High Baseline (29,250)")
     ax1.set_ylabel("Operation-Count Proxy (ops/window)")
-    ax1.set_title("Algorithmic Work Proxy (with 95% CI)", fontweight="bold")
+    ax1.set_title("Algorithmic Work Proxy (Observed with 95% CI)", fontweight="bold")
     ax1.set_ylim(0, 36000)
     ax1.set_xticks(range(len(labels)))
     ax1.set_xticklabels(labels, rotation=20, ha="right")
     ax1.legend(loc="upper left")
 
-    for bar in bars1:
-        h = bar.get_height()
-        ax1.annotate(f"{h:,.0f}",
-                     xy=(bar.get_x() + bar.get_width() / 2, h),
+    for bar, val in zip(bars1, obs_ops):
+        ax1.annotate(f"{val:,.0f}",
+                     xy=(bar.get_x() + bar.get_width() / 2, val),
                      xytext=(0, 6), textcoords="offset points",
-                     ha="center", va="bottom", fontsize=8.5)
+                     ha="center", va="bottom", fontsize=8.5, fontweight="bold")
 
     # Panel 2: Escalation rate by signal case comparing Candidate v1.1 vs Candidate v1.2
     cases = ["normal", "frequency_shift", "added_harmonic", "impact"]
@@ -226,7 +235,7 @@ def plot_v1_2_case_and_snr_breakdown(df: pd.DataFrame, out_dir: Path):
 
 
 def format_markdown_table(df: pd.DataFrame) -> str:
-    """Format DataFrame as a GitHub-flavored Markdown table without tabulate."""
+    """Format DataFrame as a GitHub-flavored Markdown table without external dependencies."""
     headers = list(df.columns)
     lines = []
     lines.append("| " + " | ".join(headers) + " |")
@@ -236,39 +245,49 @@ def format_markdown_table(df: pd.DataFrame) -> str:
     return "\n".join(lines) + "\n"
 
 
-def generate_tables(prov_data: dict, df: pd.DataFrame, tables_dir: Path):
-    """Generate Markdown and CSV tables for Candidate v1.2 evaluation."""
+def generate_tables(obs_data: dict, prov_data: dict, df: pd.DataFrame, tables_dir: Path):
+    """Generate Markdown and CSV tables using observed point estimates and 95% bootstrap CIs."""
     ci_data = prov_data["bootstrap_uncertainty_95ci"]
     methods = ["fixed_low", "fixed_high", "candidate_v1.1", "candidate_v1.2"]
     labels = ["Fixed-Low", "Fixed-High", "Candidate v1.1 (frozen)", "Candidate v1.2 (improved)"]
 
-    # Table 1: Overall Performance with 95% CIs
+    # Table 1: Overall Performance (Observed point estimates with 95% bootstrap CIs)
     t1_rows = []
     for m, lbl in zip(methods, labels):
+        obs_m = obs_data["methods"][m]
+        obs_met = obs_m["metrics"]
         m_ci = ci_data[m]
-        # Escalation rate
-        if f"{m}_fft" in df.columns:
-            esc_rate = df[f"{m}_fft"].mean() * 100
-        else:
-            esc_rate = 0.0 if m == "fixed_low" else 100.0
+
+        obs_f1 = obs_met["f1"]
+        obs_prec = obs_met["precision"]
+        obs_rec = obs_met["recall"]
+        obs_far = obs_met["false_alarm_rate"]
+        obs_ops = obs_m["avg_op_count_proxy"]
+        obs_sav = obs_m["savings_vs_fixed_high_percent"]
+        obs_esc = obs_m["escalation_rate"] * 100.0
+
         t1_rows.append({
             "Method": lbl,
-            "F1 Score [95% CI]": f"{m_ci['f1']['mean']:.4f} [{m_ci['f1']['ci_95'][0]:.4f}, {m_ci['f1']['ci_95'][1]:.4f}]",
-            "Precision [95% CI]": f"{m_ci['precision']['mean']:.4f} [{m_ci['precision']['ci_95'][0]:.4f}, {m_ci['precision']['ci_95'][1]:.4f}]",
-            "Recall [95% CI]": f"{m_ci['recall']['mean']:.4f} [{m_ci['recall']['ci_95'][0]:.4f}, {m_ci['recall']['ci_95'][1]:.4f}]",
-            "FAR [95% CI]": f"{m_ci['false_alarm_rate']['mean']:.4f} [{m_ci['false_alarm_rate']['ci_95'][0]:.4f}, {m_ci['false_alarm_rate']['ci_95'][1]:.4f}]",
-            "Avg Ops Proxy": f"{m_ci['avg_ops']['mean']:,.1f}",
-            "Ops Savings (%)": f"{m_ci['savings']['mean']:+.2f}% [{m_ci['savings']['ci_95'][0]:+.2f}%, {m_ci['savings']['ci_95'][1]:+.2f}%]",
-            "Stage 2 Escalation (%)": f"{esc_rate:.1f}%",
+            "F1 Score [95% CI]": f"{obs_f1:.4f} [{m_ci['f1']['ci_95'][0]:.4f}, {m_ci['f1']['ci_95'][1]:.4f}]",
+            "Precision [95% CI]": f"{obs_prec:.4f} [{m_ci['precision']['ci_95'][0]:.4f}, {m_ci['precision']['ci_95'][1]:.4f}]",
+            "Recall [95% CI]": f"{obs_rec:.4f} [{m_ci['recall']['ci_95'][0]:.4f}, {m_ci['recall']['ci_95'][1]:.4f}]",
+            "FAR [95% CI]": f"{obs_far:.4f} [{m_ci['false_alarm_rate']['ci_95'][0]:.4f}, {m_ci['false_alarm_rate']['ci_95'][1]:.4f}]",
+            "Avg Ops Proxy": f"{obs_ops:,.1f}",
+            "Ops Savings (%) [95% CI]": f"{obs_sav:+.2f}% [{m_ci['savings']['ci_95'][0]:+.2f}%, {m_ci['savings']['ci_95'][1]:+.2f}%]",
+            "Stage 2 Escalation (%)": f"{obs_esc:.1f}%",
         })
 
     t1_df = pd.DataFrame(t1_rows)
-    t1_df.to_csv(tables_dir / "v1_2_overall_performance_table.csv", index=False)
-    with open(tables_dir / "v1_2_overall_performance_table.md", "w") as f:
+    t1_df.to_csv(tables_dir / "v1_2_overall_performance_table.csv", index=False, encoding="utf-8")
+    with open(tables_dir / "v1_2_overall_performance_table.md", "w", encoding="utf-8") as f:
         f.write("# Candidate v1.2 Independent Holdout Overall Performance\n\n")
-        f.write("Evaluated on 320 independent held-out windows (20 groups, seed 20261014). Confidence intervals are 95% group-level bootstrap (1,000 iterations).\n\n")
+        f.write("Evaluated on 320 independent held-out windows (20 source groups, master seed 20261014).\n")
+        f.write("Headline values are observed point estimates; bracketed intervals are 95% group-level bootstrap confidence intervals (1,000 iterations).\n\n")
         f.write(format_markdown_table(t1_df))
-        f.write("\n")
+        f.write("\n> **Statistical Note on Operation Savings:** Observed operation savings for Candidate v1.2 are positive at **+1.78%** ")
+        f.write("(28,729.1 ops vs 29,250.0 for Fixed-High). However, the 95% group-level bootstrap interval is **-1.66% to +4.91%**, ")
+        f.write("which spans zero. While Candidate v1.2 matches Fixed-High detection quality exactly (F1 0.9534, Recall 0.9375, FAR 0.0875) ")
+        f.write("and recovers subtle added harmonics, the operational savings margin is narrow on this 20-group holdout.\n")
 
     # Table 2: Case Breakdown
     cases = ["normal", "frequency_shift", "added_harmonic", "impact"]
@@ -291,8 +310,8 @@ def generate_tables(prov_data: dict, df: pd.DataFrame, tables_dir: Path):
         t2_rows.append(row)
 
     t2_df = pd.DataFrame(t2_rows)
-    t2_df.to_csv(tables_dir / "v1_2_case_breakdown_table.csv", index=False)
-    with open(tables_dir / "v1_2_case_breakdown_table.md", "w") as f:
+    t2_df.to_csv(tables_dir / "v1_2_case_breakdown_table.csv", index=False, encoding="utf-8")
+    with open(tables_dir / "v1_2_case_breakdown_table.md", "w", encoding="utf-8") as f:
         f.write("# Candidate v1.2 Independent Holdout Per-Case Breakdown\n\n")
         f.write(format_markdown_table(t2_df))
         f.write("\n")
@@ -317,8 +336,8 @@ def generate_tables(prov_data: dict, df: pd.DataFrame, tables_dir: Path):
         t3_rows.append(row)
 
     t3_df = pd.DataFrame(t3_rows)
-    t3_df.to_csv(tables_dir / "v1_2_snr_breakdown_table.csv", index=False)
-    with open(tables_dir / "v1_2_snr_breakdown_table.md", "w") as f:
+    t3_df.to_csv(tables_dir / "v1_2_snr_breakdown_table.csv", index=False, encoding="utf-8")
+    with open(tables_dir / "v1_2_snr_breakdown_table.md", "w", encoding="utf-8") as f:
         f.write("# Candidate v1.2 Independent Holdout SNR Breakdown\n\n")
         f.write(format_markdown_table(t3_df))
         f.write("\n")
@@ -335,11 +354,15 @@ def main():
     figures_dir.mkdir(parents=True, exist_ok=True)
     tables_dir.mkdir(parents=True, exist_ok=True)
 
+    obs_path = results_dir / "candidate_v1.2_independent_evaluation.json"
     prov_path = results_dir / "candidate_v1.2_provenance_and_uncertainty.json"
     rep_csv_path = results_dir / "candidate_v1.2_reproduced_windows.csv"
 
-    if not prov_path.exists() or not rep_csv_path.exists():
-        raise FileNotFoundError("Missing provenance json or reproduced windows csv. Run verify_v1_2_provenance.py first.")
+    if not obs_path.exists() or not prov_path.exists() or not rep_csv_path.exists():
+        raise FileNotFoundError("Missing evaluation JSON, provenance JSON, or reproduced windows CSV.")
+
+    with open(obs_path, "r") as f:
+        obs_data = json.load(f)
 
     with open(prov_path, "r") as f:
         prov_data = json.load(f)
@@ -347,10 +370,10 @@ def main():
     df = pd.read_csv(rep_csv_path)
 
     set_plot_style()
-    plot_v1_2_performance_with_cis(prov_data, figures_dir)
-    plot_v1_2_work_and_escalation(prov_data, df, figures_dir)
+    plot_v1_2_performance_with_cis(obs_data, prov_data, figures_dir)
+    plot_v1_2_work_and_escalation(obs_data, prov_data, df, figures_dir)
     plot_v1_2_case_and_snr_breakdown(df, figures_dir)
-    generate_tables(prov_data, df, tables_dir)
+    generate_tables(obs_data, prov_data, df, tables_dir)
 
 
 if __name__ == "__main__":

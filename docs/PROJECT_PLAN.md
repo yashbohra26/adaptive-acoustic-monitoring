@@ -123,8 +123,8 @@ Full outputs: [`results/phase5_final_evaluation.json`](../results/phase5_final_e
    - Pure C++ core algorithm module ([`esp32_demo/src/adaptive_core.h`](../esp32_demo/src/adaptive_core.h)) implementing the exact decision hierarchy, free of Arduino hardware dependencies.
    - PlatformIO configuration ([`esp32_demo/platformio.ini`](../esp32_demo/platformio.ini)), Wokwi configuration ([`esp32_demo/wokwi.toml`](../esp32_demo/wokwi.toml)), Wokwi board diagram ([`esp32_demo/diagram.json`](../esp32_demo/diagram.json)), and Arduino firmware sketch ([`esp32_demo/src/main.cpp`](../esp32_demo/src/main.cpp)).
    - 5 representative vectors exported strictly from development group `g0001` ([`esp32_demo/src/demo_vectors.h`](../esp32_demo/src/demo_vectors.h)) demonstrating both cheap Stage 1 early stops (clean normal, impact anomaly) and Stage 2 FFT escalations (frequency shift, high noise). Zero test data used.
-   - 100% decision and stage parity between C++ and Python Protocol v1.1.0 verified via standalone desktop C++ test harness ([`esp32_demo/test_harness.cpp`](../esp32_demo/test_harness.cpp)) and automated Python test suite.
-   - **Status:** C++ code parity 100% verified. Live simulation in Wokwi remains pending manual execution.
+   - 100% decision, stage, and numeric parity between C++ and Python verified via standalone desktop C++ test harness ([`esp32_demo/test_harness.cpp`](../esp32_demo/test_harness.cpp), 100% full parity for v1.1 and v1.2) and automated Python test suite.
+   - **Status:** Desktop C++ harness passes with 100% full parity. Interactive live simulation in Wokwi remains pending manual execution until serial output is directly observed.
 
 2. **FFT Reuse and Operation Cost Model Alignment:**
    - Single-pass rFFT spectral extraction implemented in `python/features.py` (`extract_spectral_features`), eliminating duplicate FFT execution in `FixedHighDetector.predict` and escalated adaptive windows.
@@ -138,11 +138,11 @@ Full outputs: [`results/phase5_final_evaluation.json`](../results/phase5_final_e
 4. **Candidate v1.2 Development Study & Independent Holdout:**
    - Diagnosed harmonic failure mode on development data using 5-fold grouped cross-validation.
    - Selected $P_{\text{normal}} = \text{p50} = 1.3110$, freezing Protocol v1.2.0 in [`results/evaluation_protocol_v1.2.json`](../results/evaluation_protocol_v1.2.json) before evaluation.
-   - Evaluated on a freshly generated independent held-out dataset (20 groups, seed=20261014, SHA-256 `5b918927...`): Fixed-High F1 0.9534, Recall 0.9375; Candidate v1.2 F1 0.9534, Recall 0.9375, FAR 0.0875, 28,729 ops (+1.78% savings), meeting all pre-declared quality constraints ([`results/candidate_v1.2_independent_evaluation.json`](../results/candidate_v1.2_independent_evaluation.json)).
+   - Evaluated on a freshly generated independent held-out dataset (20 groups, seed=20261014; legacy group hash `5b918927...`, canonical content hash `96264358...`): observed Fixed-High F1 0.9534, Recall 0.9375; Candidate v1.2 observed F1 0.9534, Recall 0.9375, FAR 0.0875, 28,729.1 ops (+1.78% observed savings; 95% bootstrap interval [-1.66%, +4.91%], which spans zero), meeting all pre-declared quality constraints ([`results/candidate_v1.2_independent_evaluation.json`](../results/candidate_v1.2_independent_evaluation.json)).
 
 5. **Publication-Ready Figures & Prior Art:**
-   - Generated 5 publication figures in [`results/figures/`](../results/figures/) and summary tables in [`results/tables/`](../results/tables/).
-   - Synthesized comprehensive prior art review in [`docs/PRIOR_ART.md`](PRIOR_ART.md).
+   - Generated separate publication figures in [`results/figures/`](../results/figures/) and summary tables in [`results/tables/`](../results/tables/) for both Phase 5 / Candidate v1.1 and Candidate v1.2.
+   - Synthesized verified prior art review in [`docs/PRIOR_ART.md`](PRIOR_ART.md).
 
 ## Phase 7 — Report and presentation (Deferred)
 

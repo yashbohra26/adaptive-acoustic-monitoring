@@ -174,11 +174,19 @@ def test_historical_phase5_metrics_reproduce():
 def test_quality_constraints_audit_accurate_reporting():
     """Verify and audit the pre-declared quality constraints on the held-out test set.
 
-    Pre-declared rules relative to Fixed-High reference baseline:
-    1. F1 constraint: Adaptive F1 >= Fixed-High F1 - 0.05
-    2. FAR constraint: Adaptive FAR <= Fixed-High FAR + 0.01
-    3. Ops constraint: Adaptive Ops < Fixed-High Ops (29,250)
-    4. Recall constraint: Adaptive Recall >= Fixed-High Recall - 0.05
+    Documented Predeclared Constraints:
+    - Primary source: python/run_phase4_study.py (lines 317–325) and docs/PHASE4_INVESTIGATION.md (lines 14–17).
+    - Preserved in: python/investigate_difficult_cases.py (lines 316–320).
+    1. F1 constraint: Delta F1 >= -0.05 (Adaptive F1 >= Fixed-High F1 - 0.05)
+    2. Recall constraint: Delta Recall >= -0.05 (Adaptive Recall >= Fixed-High Recall - 0.05)
+    3. FAR constraint: Delta FAR <= +0.01 (Adaptive FAR <= Fixed-High FAR + 0.01)
+    4. Ops constraint: Adaptive Ops < Fixed-High Ops (29,250) (positive operational savings)
+
+    Discrepancy Reconciliation Note:
+    Earlier handoff prose loosely mentioned Delta F1 >= -0.02 and Delta FAR <= +0.02.
+    That phrasing was an unverified discrepancy in the handoff text. The actual criteria
+    pre-declared in code and recorded in evaluation artifacts since Phase 4 are strictly
+    -0.05 on F1, -0.05 on Recall, +0.01 on FAR, and Ops < 29,250.
 
     CRITICAL CHECK: Accurately asserts that Candidate v1.1 FAILS the recall constraint!
     """
@@ -274,6 +282,12 @@ def test_candidate_v1_2_frozen_metrics_reproduce():
 
 def test_candidate_v1_2_quality_status_computation():
     """Verify that Candidate v1.2 quality constraint status is accurately computed from saved metrics.
+
+    Documented Predeclared Constraints (python/run_phase4_study.py:317-325, python/investigate_difficult_cases.py:316-320):
+    - F1 Target: Fixed-High F1 - 0.05
+    - Recall Target: Fixed-High Recall - 0.05
+    - FAR Target: Fixed-High FAR + 0.01
+    - Ops Target: < 29,250.0 ops/window
 
     Checks:
     1. Candidate v1.2 meets F1, Recall, FAR, and Ops constraints relative to Fixed-High.

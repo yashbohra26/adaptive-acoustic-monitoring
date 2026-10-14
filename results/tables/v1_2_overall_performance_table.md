@@ -1,11 +1,13 @@
 # Candidate v1.2 Independent Holdout Overall Performance
 
-Evaluated on 320 independent held-out windows (20 groups, seed 20261014). Confidence intervals are 95% group-level bootstrap (1,000 iterations).
+Evaluated on 320 independent held-out windows (20 source groups, master seed 20261014).
+Headline values are observed point estimates; bracketed intervals are 95% group-level bootstrap confidence intervals (1,000 iterations).
 
-| Method | F1 Score [95% CI] | Precision [95% CI] | Recall [95% CI] | FAR [95% CI] | Avg Ops Proxy | Ops Savings (%) | Stage 2 Escalation (%) |
+| Method | F1 Score [95% CI] | Precision [95% CI] | Recall [95% CI] | FAR [95% CI] | Avg Ops Proxy | Ops Savings (%) [95% CI] | Stage 2 Escalation (%) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Fixed-Low | 0.5413 [0.5196, 0.5638] | 0.9482 [0.9091, 0.9794] | 0.3789 [0.3583, 0.4000] | 0.0626 [0.0250, 0.1125] | 10,265.0 | +64.91% [+64.91%, +64.91%] | 0.0% |
-| Fixed-High | 0.9531 [0.9231, 0.9793] | 0.9698 [0.9534, 0.9866] | 0.9375 [0.8792, 0.9833] | 0.0879 [0.0375, 0.1375] | 29,250.0 | +0.00% [+0.00%, +0.00%] | 100.0% |
-| Candidate v1.1 (frozen) | 0.9044 [0.8767, 0.9325] | 0.9668 [0.9486, 0.9854] | 0.8500 [0.8042, 0.8958] | 0.0879 [0.0375, 0.1375] | 26,173.9 | +10.52% [+7.41%, +13.66%] | 54.4% |
-| Candidate v1.2 (improved) | 0.9531 [0.9231, 0.9793] | 0.9698 [0.9534, 0.9866] | 0.9375 [0.8792, 0.9833] | 0.0879 [0.0375, 0.1375] | 28,717.6 | +1.82% [-1.66%, +4.91%] | 63.1% |
+| Fixed-Low | 0.5417 [0.5196, 0.5638] | 0.9479 [0.9091, 0.9794] | 0.3792 [0.3583, 0.4000] | 0.0625 [0.0250, 0.1125] | 10,265.0 | +64.91% [+64.91%, +64.91%] | 0.0% |
+| Fixed-High | 0.9534 [0.9231, 0.9793] | 0.9698 [0.9534, 0.9866] | 0.9375 [0.8792, 0.9833] | 0.0875 [0.0375, 0.1375] | 29,250.0 | +0.00% [+0.00%, +0.00%] | 100.0% |
+| Candidate v1.1 (frozen) | 0.9047 [0.8767, 0.9325] | 0.9668 [0.9486, 0.9854] | 0.8500 [0.8042, 0.8958] | 0.0875 [0.0375, 0.1375] | 26,169.7 | +10.53% [+7.41%, +13.66%] | 54.4% |
+| Candidate v1.2 (improved) | 0.9534 [0.9231, 0.9793] | 0.9698 [0.9534, 0.9866] | 0.9375 [0.8792, 0.9833] | 0.0875 [0.0375, 0.1375] | 28,729.1 | +1.78% [-1.66%, +4.91%] | 63.1% |
 
+> **Statistical Note on Operation Savings:** Observed operation savings for Candidate v1.2 are positive at **+1.78%** (28,729.1 ops vs 29,250.0 for Fixed-High). However, the 95% group-level bootstrap interval is **-1.66% to +4.91%**, which spans zero. While Candidate v1.2 matches Fixed-High detection quality exactly (F1 0.9534, Recall 0.9375, FAR 0.0875) and recovers subtle added harmonics, the operational savings margin is narrow on this 20-group holdout.

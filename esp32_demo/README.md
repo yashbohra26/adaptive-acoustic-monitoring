@@ -1,9 +1,9 @@
 # ESP32 Embedded Adaptive Acoustic Monitoring Demo (Wokwi)
 
 > **Phase:** Phase 6 — Firmware Decision-Flow Demonstration  
-> **Status:** Software-Only Desktop Parity Verified (100% pass on GCC); Interactive Wokwi Simulation Pending Manual Run  
-> **Default Configuration:** Frozen Candidate Selector v1.1 (`cand_v1.1_p60_anomaly_first`, `esp32_demo/src/adaptive_core.h`)  
-> **Alternative Configuration:** Candidate Selector v1.2 (`esp32_demo/src/adaptive_core_v1_2.h`)  
+> **Status:** Software-Only Desktop C++ Parity Verified (100% full parity on GCC); Interactive Wokwi Simulation Pending Manual Run  
+> **Active Firmware Demo (`src/main.cpp`):** Frozen Candidate Selector v1.1 (`cand_v1.1_p60_anomaly_first`, `src/adaptive_core.h`)  
+> **Desktop C++ Configuration (`src/adaptive_core_v1_2.h`):** Candidate Selector v1.2 (evaluated via `test_harness.cpp`; not active in the default simulator firmware)  
 > **Target Hardware:** ESP32 (simulated via Wokwi / ESP32-WROOM-32)  
 > **Signal Source:** Deterministic development vectors from Group `g0001` (zero held-out test data used)
 
@@ -11,14 +11,15 @@
 
 ## 1. Overview and Purpose
 
-This module provides a self-contained embedded C++ implementation of the **frozen Candidate Selector v1.1** decision logic (with Candidate v1.2 configuration also available in `src/adaptive_core_v1_2.h`), demonstrating how the adaptive two-stage cascade executes on a resource-constrained microcontroller (ESP32).
+This module provides a self-contained embedded C++ implementation of the **frozen Candidate Selector v1.1** decision logic, demonstrating how the adaptive two-stage cascade executes on a microcontroller target (ESP32).
 
 ### Key Demonstration Goals:
-1. **Faithful Protocol v1.1.0 Port (Default):** Implements the exact decision hierarchy and calibration constants from `results/evaluation_protocol_v1.1.json`.
+1. **Faithful Protocol v1.1.0 Port in Firmware:** `src/main.cpp` implements the exact decision hierarchy and calibration constants from `results/evaluation_protocol_v1.1.json`.
 2. **Early-Stop Execution:** Shows that obvious time-domain anomalies (e.g., impacts) and confident normal signals stop cheaply at Stage 1 ($10,265$ ops proxy), avoiding unnecessary FFT calculations.
 3. **Selective FFT Escalation:** Shows that frequency shifts and ambiguous signals reliably escalate to Stage 2 ($39,515$ ops cumulative proxy).
-4. **Transparent Trade-Off Demonstration:** Demonstrates why Candidate v1.1 missed subtle added harmonics (Vector 4), and verifies how Candidate v1.2 recovers detection by recalibrating $P_{\text{normal}} = 1.311028$ (50th percentile).
+4. **Transparent Trade-Off Demonstration:** Demonstrates why Candidate v1.1 missed subtle added harmonics (Vector 4 stopping at Stage 1), and uses desktop C++ test harness (`test_harness.cpp`) to verify how Candidate Selector v1.2 recovers detection by recalibrating $P_{\text{normal}} = 1.311028$ (50th percentile).
 5. **Zero Test Data Leakage:** Evaluated exclusively on deterministic development signals from Group `g0001`.
+6. **Wokwi Simulation Status:** Desktop C++ parity is verified at 100%. Interactive Wokwi execution in the browser or VS Code remains pending manual launch until serial monitor output is directly confirmed. Candidate v1.2 is currently tested as a separate desktop C++ core and is not called a Wokwi demo.
 
 ---
 
