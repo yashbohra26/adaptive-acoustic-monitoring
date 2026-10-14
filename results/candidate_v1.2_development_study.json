@@ -1,0 +1,72 @@
+[
+  {
+    "p_normal_percentile": 20.0,
+    "f1": 0.953604568165596,
+    "recall": 0.9277777777777778,
+    "precision": 0.9809104258443465,
+    "false_alarm_rate": 0.05416666666666667,
+    "avg_ops": 30861.875,
+    "escalation_rate": 0.7041666666666667,
+    "savings_percent": -5.510683760683761
+  },
+  {
+    "p_normal_percentile": 30.0,
+    "f1": 0.953604568165596,
+    "recall": 0.9277777777777778,
+    "precision": 0.9809104258443465,
+    "false_alarm_rate": 0.05416666666666667,
+    "avg_ops": 30313.4375,
+    "escalation_rate": 0.6854166666666667,
+    "savings_percent": -3.63568376068376
+  },
+  {
+    "p_normal_percentile": 35.0,
+    "f1": 0.953604568165596,
+    "recall": 0.9277777777777778,
+    "precision": 0.9809104258443465,
+    "false_alarm_rate": 0.05416666666666667,
+    "avg_ops": 29947.8125,
+    "escalation_rate": 0.6729166666666667,
+    "savings_percent": -2.3856837606837606
+  },
+  {
+    "p_normal_percentile": 40.0,
+    "f1": 0.953604568165596,
+    "recall": 0.9277777777777778,
+    "precision": 0.9809104258443465,
+    "false_alarm_rate": 0.05416666666666667,
+    "avg_ops": 29643.125,
+    "escalation_rate": 0.6625,
+    "savings_percent": -1.3440170940170941
+  },
+  {
+    "p_normal_percentile": 45.0,
+    "f1": 0.953604568165596,
+    "recall": 0.9277777777777778,
+    "precision": 0.9809104258443465,
+    "false_alarm_rate": 0.05416666666666667,
+    "avg_ops": 29003.28125,
+    "escalation_rate": 0.640625,
+    "savings_percent": 0.843482905982906
+  },
+  {
+    "p_normal_percentile": 50.0,
+    "f1": 0.953604568165596,
+    "recall": 0.9277777777777778,
+    "precision": 0.9809104258443465,
+    "false_alarm_rate": 0.05416666666666667,
+    "avg_ops": 28637.65625,
+    "escalation_rate": 0.628125,
+    "savings_percent": 2.093482905982906
+  },
+  {
+    "p_normal_percentile": 60.0,
+    "f1": 0.9491039426523297,
+    "recall": 0.9194444444444444,
+    "precision": 0.9807407407407407,
+    "false_alarm_rate": 0.05416666666666667,
+    "avg_ops": 27906.40625,
+    "escalation_rate": 0.603125,
+    "savings_percent": 4.593482905982906
+  }
+]

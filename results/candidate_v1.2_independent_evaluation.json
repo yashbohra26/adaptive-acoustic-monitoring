@@ -1,0 +1,77 @@
+{
+  "status": "INDEPENDENT_HOLDOUT_EVALUATION_COMPLETE",
+  "protocol_version": "1.2.0",
+  "eval_seed": 20261014,
+  "eval_windows": 320,
+  "eval_split_hash_sha256": "5b9189274f9dc2853b485673b8793027d2bbe22d7bb51512f1a3b52967b45454",
+  "methods": {
+    "fixed_low": {
+      "metrics": {
+        "accuracy": 0.51875,
+        "precision": 0.9479166666666666,
+        "recall": 0.37916666666666665,
+        "f1": 0.5416666666666666,
+        "false_alarm_rate": 0.0625,
+        "tp": 91,
+        "fp": 5,
+        "tn": 75,
+        "fn": 149
+      },
+      "avg_op_count_proxy": 10265.0,
+      "savings_vs_fixed_high_percent": 64.90598290598291,
+      "escalation_rate": 0.0,
+      "meets_quality_constraints": "REFERENCE"
+    },
+    "fixed_high": {
+      "metrics": {
+        "accuracy": 0.93125,
+        "precision": 0.9698275862068966,
+        "recall": 0.9375,
+        "f1": 0.9533898305084746,
+        "false_alarm_rate": 0.0875,
+        "tp": 225,
+        "fp": 7,
+        "tn": 73,
+        "fn": 15
+      },
+      "avg_op_count_proxy": 29250.0,
+      "savings_vs_fixed_high_percent": 0.0,
+      "escalation_rate": 1.0,
+      "meets_quality_constraints": "REFERENCE"
+    },
+    "candidate_v1.1": {
+      "metrics": {
+        "accuracy": 0.865625,
+        "precision": 0.966824644549763,
+        "recall": 0.85,
+        "f1": 0.9046563192904656,
+        "false_alarm_rate": 0.0875,
+        "tp": 204,
+        "fp": 7,
+        "tn": 73,
+        "fn": 36
+      },
+      "avg_op_count_proxy": 26169.6875,
+      "savings_vs_fixed_high_percent": 10.530982905982906,
+      "escalation_rate": 0.54375,
+      "meets_quality_constraints": "NO (Rec:0.850 vs 0.887)"
+    },
+    "candidate_v1.2": {
+      "metrics": {
+        "accuracy": 0.93125,
+        "precision": 0.9698275862068966,
+        "recall": 0.9375,
+        "f1": 0.9533898305084746,
+        "false_alarm_rate": 0.0875,
+        "tp": 225,
+        "fp": 7,
+        "tn": 73,
+        "fn": 15
+      },
+      "avg_op_count_proxy": 28729.0625,
+      "savings_vs_fixed_high_percent": 1.780982905982906,
+      "escalation_rate": 0.63125,
+      "meets_quality_constraints": "YES"
+    }
+  }
+}

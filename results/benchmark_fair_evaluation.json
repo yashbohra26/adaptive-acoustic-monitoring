@@ -1,0 +1,677 @@
+{
+  "status": "FAIR_BENCHMARK_COMPLETE",
+  "timestamp_iso": "2026-10-14T12:53:07Z",
+  "test_windows": 320,
+  "test_groups": 20,
+  "timing_parameters": {
+    "warmup_iterations": 5,
+    "timed_repetitions": 25,
+    "timer": "time.perf_counter_ns",
+    "unit": "milliseconds (ms)",
+    "disclaimer": "Measured on host CPU under Python 3.13; does NOT represent ESP32 runtime or physical energy."
+  },
+  "methods": {
+    "fixed_low": {
+      "metrics": {
+        "accuracy": 0.528125,
+        "precision": 0.9405940594059405,
+        "recall": 0.3958333333333333,
+        "f1": 0.5571847507331378,
+        "false_alarm_rate": 0.075,
+        "tp": 95,
+        "fp": 6,
+        "tn": 74,
+        "fn": 145
+      },
+      "freq_mae_hz": 91.44476834092991,
+      "avg_op_count_proxy": 10265.0,
+      "savings_vs_fixed_high_percent": 64.90598290598291,
+      "escalation_rate": 0.0,
+      "escalation_reason_counts": {
+        "none": 320
+      },
+      "runtime_ms": {
+        "mean": 0.1623344125,
+        "std": 0.07430773995977703
+      },
+      "by_case": {
+        "normal": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.925,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "false_alarm_rate": 0.075,
+            "tp": 0,
+            "fp": 6,
+            "tn": 74,
+            "fn": 0
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.16555215,
+          "escalation_rate": 0.0
+        },
+        "frequency_shift": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.0625,
+            "precision": 1.0,
+            "recall": 0.0625,
+            "f1": 0.11764705882352941,
+            "false_alarm_rate": 0.0,
+            "tp": 5,
+            "fp": 0,
+            "tn": 0,
+            "fn": 75
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.15464635000000002,
+          "escalation_rate": 0.0
+        },
+        "added_harmonic": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.125,
+            "precision": 1.0,
+            "recall": 0.125,
+            "f1": 0.2222222222222222,
+            "false_alarm_rate": 0.0,
+            "tp": 10,
+            "fp": 0,
+            "tn": 0,
+            "fn": 70
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.16643515,
+          "escalation_rate": 0.0
+        },
+        "impact": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_alarm_rate": 0.0,
+            "tp": 80,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.16270400000000002,
+          "escalation_rate": 0.0
+        }
+      },
+      "by_snr": {
+        "30.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.5,
+            "precision": 1.0,
+            "recall": 0.3333333333333333,
+            "f1": 0.5,
+            "false_alarm_rate": 0.0,
+            "tp": 20,
+            "fp": 0,
+            "tn": 20,
+            "fn": 40
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.18011875000000002,
+          "escalation_rate": 0.0
+        },
+        "20.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.5,
+            "precision": 1.0,
+            "recall": 0.3333333333333333,
+            "f1": 0.5,
+            "false_alarm_rate": 0.0,
+            "tp": 20,
+            "fp": 0,
+            "tn": 20,
+            "fn": 40
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.15158835,
+          "escalation_rate": 0.0
+        },
+        "10.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.5,
+            "precision": 1.0,
+            "recall": 0.3333333333333333,
+            "f1": 0.5,
+            "false_alarm_rate": 0.0,
+            "tp": 20,
+            "fp": 0,
+            "tn": 20,
+            "fn": 40
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.14623119999999998,
+          "escalation_rate": 0.0
+        },
+        "0.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.6125,
+            "precision": 0.8536585365853658,
+            "recall": 0.5833333333333334,
+            "f1": 0.6930693069306931,
+            "false_alarm_rate": 0.3,
+            "tp": 35,
+            "fp": 6,
+            "tn": 14,
+            "fn": 25
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.17139935,
+          "escalation_rate": 0.0
+        }
+      }
+    },
+    "fixed_high": {
+      "metrics": {
+        "accuracy": 0.925,
+        "precision": 0.9655172413793104,
+        "recall": 0.9333333333333333,
+        "f1": 0.9491525423728815,
+        "false_alarm_rate": 0.1,
+        "tp": 224,
+        "fp": 8,
+        "tn": 72,
+        "fn": 16
+      },
+      "freq_mae_hz": 0.8456863556895939,
+      "avg_op_count_proxy": 29250.0,
+      "savings_vs_fixed_high_percent": 0.0,
+      "escalation_rate": 1.0,
+      "escalation_reason_counts": {
+        "none": 320
+      },
+      "runtime_ms": {
+        "mean": 0.467636025,
+        "std": 0.19517496922735603
+      },
+      "by_case": {
+        "normal": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.9,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "false_alarm_rate": 0.1,
+            "tp": 0,
+            "fp": 8,
+            "tn": 72,
+            "fn": 0
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.4665355,
+          "escalation_rate": 1.0
+        },
+        "frequency_shift": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.8,
+            "precision": 1.0,
+            "recall": 0.8,
+            "f1": 0.888888888888889,
+            "false_alarm_rate": 0.0,
+            "tp": 64,
+            "fp": 0,
+            "tn": 0,
+            "fn": 16
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.46452105,
+          "escalation_rate": 1.0
+        },
+        "added_harmonic": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_alarm_rate": 0.0,
+            "tp": 80,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.45577435,
+          "escalation_rate": 1.0
+        },
+        "impact": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_alarm_rate": 0.0,
+            "tp": 80,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.48371320000000007,
+          "escalation_rate": 1.0
+        }
+      },
+      "by_snr": {
+        "30.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.95,
+            "precision": 1.0,
+            "recall": 0.9333333333333333,
+            "f1": 0.9655172413793104,
+            "false_alarm_rate": 0.0,
+            "tp": 56,
+            "fp": 0,
+            "tn": 20,
+            "fn": 4
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.48497130000000005,
+          "escalation_rate": 1.0
+        },
+        "20.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.95,
+            "precision": 1.0,
+            "recall": 0.9333333333333333,
+            "f1": 0.9655172413793104,
+            "false_alarm_rate": 0.0,
+            "tp": 56,
+            "fp": 0,
+            "tn": 20,
+            "fn": 4
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.46561535000000004,
+          "escalation_rate": 1.0
+        },
+        "10.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.95,
+            "precision": 1.0,
+            "recall": 0.9333333333333333,
+            "f1": 0.9655172413793104,
+            "false_alarm_rate": 0.0,
+            "tp": 56,
+            "fp": 0,
+            "tn": 20,
+            "fn": 4
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.45109199999999994,
+          "escalation_rate": 1.0
+        },
+        "0.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.85,
+            "precision": 0.875,
+            "recall": 0.9333333333333333,
+            "f1": 0.9032258064516129,
+            "false_alarm_rate": 0.4,
+            "tp": 56,
+            "fp": 8,
+            "tn": 12,
+            "fn": 4
+          },
+          "avg_ops": 29250.0,
+          "avg_runtime_ms": 0.46886545,
+          "escalation_rate": 1.0
+        }
+      }
+    },
+    "candidate_v1.1": {
+      "metrics": {
+        "accuracy": 0.88125,
+        "precision": 0.963302752293578,
+        "recall": 0.875,
+        "f1": 0.9170305676855894,
+        "false_alarm_rate": 0.1,
+        "tp": 210,
+        "fp": 8,
+        "tn": 72,
+        "fn": 30
+      },
+      "freq_mae_hz": 2.7517584813229616,
+      "avg_op_count_proxy": 26992.34375,
+      "savings_vs_fixed_high_percent": 7.718482905982905,
+      "escalation_rate": 0.571875,
+      "escalation_reason_counts": {
+        "uncertain_score": 46,
+        "zcf_out_of_range": 137,
+        "confident_anomaly": 80,
+        "confident_normal": 57
+      },
+      "runtime_ms": {
+        "mean": 0.44680846249999995,
+        "std": 0.32461430083598614
+      },
+      "by_case": {
+        "normal": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.9,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "false_alarm_rate": 0.1,
+            "tp": 0,
+            "fp": 8,
+            "tn": 72,
+            "fn": 0
+          },
+          "avg_ops": 24890.0,
+          "avg_runtime_ms": 0.42032625,
+          "escalation_rate": 0.5
+        },
+        "frequency_shift": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.8,
+            "precision": 1.0,
+            "recall": 0.8,
+            "f1": 0.888888888888889,
+            "false_alarm_rate": 0.0,
+            "tp": 64,
+            "fp": 0,
+            "tn": 0,
+            "fn": 16
+          },
+          "avg_ops": 38418.125,
+          "avg_runtime_ms": 0.61576245,
+          "escalation_rate": 0.9625
+        },
+        "added_harmonic": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.825,
+            "precision": 1.0,
+            "recall": 0.825,
+            "f1": 0.9041095890410958,
+            "false_alarm_rate": 0.0,
+            "tp": 66,
+            "fp": 0,
+            "tn": 0,
+            "fn": 14
+          },
+          "avg_ops": 34396.25,
+          "avg_runtime_ms": 0.5728281,
+          "escalation_rate": 0.825
+        },
+        "impact": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_alarm_rate": 0.0,
+            "tp": 80,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0
+          },
+          "avg_ops": 10265.0,
+          "avg_runtime_ms": 0.17831705,
+          "escalation_rate": 0.0
+        }
+      },
+      "by_snr": {
+        "30.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.85,
+            "precision": 1.0,
+            "recall": 0.8,
+            "f1": 0.888888888888889,
+            "false_alarm_rate": 0.0,
+            "tp": 48,
+            "fp": 0,
+            "tn": 20,
+            "fn": 12
+          },
+          "avg_ops": 23793.125,
+          "avg_runtime_ms": 0.39700244999999995,
+          "escalation_rate": 0.4625
+        },
+        "20.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.875,
+            "precision": 1.0,
+            "recall": 0.8333333333333334,
+            "f1": 0.9090909090909091,
+            "false_alarm_rate": 0.0,
+            "tp": 50,
+            "fp": 0,
+            "tn": 20,
+            "fn": 10
+          },
+          "avg_ops": 23793.125,
+          "avg_runtime_ms": 0.39381740000000004,
+          "escalation_rate": 0.4625
+        },
+        "10.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.95,
+            "precision": 1.0,
+            "recall": 0.9333333333333333,
+            "f1": 0.9655172413793104,
+            "false_alarm_rate": 0.0,
+            "tp": 56,
+            "fp": 0,
+            "tn": 20,
+            "fn": 4
+          },
+          "avg_ops": 28180.625,
+          "avg_runtime_ms": 0.4726114,
+          "escalation_rate": 0.6125
+        },
+        "0.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.85,
+            "precision": 0.875,
+            "recall": 0.9333333333333333,
+            "f1": 0.9032258064516129,
+            "false_alarm_rate": 0.4,
+            "tp": 56,
+            "fp": 8,
+            "tn": 12,
+            "fn": 4
+          },
+          "avg_ops": 32202.5,
+          "avg_runtime_ms": 0.5238026,
+          "escalation_rate": 0.75
+        }
+      }
+    },
+    "historical_v1.0": {
+      "metrics": {
+        "accuracy": 0.575,
+        "precision": 0.9262295081967213,
+        "recall": 0.4708333333333333,
+        "f1": 0.6243093922651933,
+        "false_alarm_rate": 0.1125,
+        "tp": 113,
+        "fp": 9,
+        "tn": 71,
+        "fn": 127
+      },
+      "freq_mae_hz": 38.36609523320254,
+      "avg_op_count_proxy": 21416.5625,
+      "savings_vs_fixed_high_percent": 26.78098290598291,
+      "escalation_rate": 0.38125,
+      "escalation_reason_counts": {
+        "confident_normal": 191,
+        "zcf_out_of_range": 108,
+        "confident_anomaly": 7,
+        "uncertain_score": 14
+      },
+      "runtime_ms": {
+        "mean": 0.3736813625,
+        "std": 0.32767108929655914
+      },
+      "by_case": {
+        "normal": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.8875,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "false_alarm_rate": 0.1125,
+            "tp": 0,
+            "fp": 9,
+            "tn": 71,
+            "fn": 0
+          },
+          "avg_ops": 14652.5,
+          "avg_runtime_ms": 0.25104935,
+          "escalation_rate": 0.15
+        },
+        "frequency_shift": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.1625,
+            "precision": 1.0,
+            "recall": 0.1625,
+            "f1": 0.27956989247311825,
+            "false_alarm_rate": 0.0,
+            "tp": 13,
+            "fp": 0,
+            "tn": 0,
+            "fn": 67
+          },
+          "avg_ops": 15749.375,
+          "avg_runtime_ms": 0.25980005,
+          "escalation_rate": 0.1875
+        },
+        "added_harmonic": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.25,
+            "precision": 1.0,
+            "recall": 0.25,
+            "f1": 0.4,
+            "false_alarm_rate": 0.0,
+            "tp": 20,
+            "fp": 0,
+            "tn": 0,
+            "fn": 60
+          },
+          "avg_ops": 15749.375,
+          "avg_runtime_ms": 0.27146885000000004,
+          "escalation_rate": 0.1875
+        },
+        "impact": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_alarm_rate": 0.0,
+            "tp": 80,
+            "fp": 0,
+            "tn": 0,
+            "fn": 0
+          },
+          "avg_ops": 39515.0,
+          "avg_runtime_ms": 0.7124072,
+          "escalation_rate": 1.0
+        }
+      },
+      "by_snr": {
+        "30.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.5125,
+            "precision": 1.0,
+            "recall": 0.35,
+            "f1": 0.5185185185185185,
+            "false_alarm_rate": 0.0,
+            "tp": 21,
+            "fp": 0,
+            "tn": 20,
+            "fn": 39
+          },
+          "avg_ops": 18308.75,
+          "avg_runtime_ms": 0.3092246,
+          "escalation_rate": 0.275
+        },
+        "20.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.5125,
+            "precision": 1.0,
+            "recall": 0.35,
+            "f1": 0.5185185185185185,
+            "false_alarm_rate": 0.0,
+            "tp": 21,
+            "fp": 0,
+            "tn": 20,
+            "fn": 39
+          },
+          "avg_ops": 18308.75,
+          "avg_runtime_ms": 0.3196822,
+          "escalation_rate": 0.275
+        },
+        "10.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.5,
+            "precision": 1.0,
+            "recall": 0.3333333333333333,
+            "f1": 0.5,
+            "false_alarm_rate": 0.0,
+            "tp": 20,
+            "fp": 0,
+            "tn": 20,
+            "fn": 40
+          },
+          "avg_ops": 17577.5,
+          "avg_runtime_ms": 0.3198954,
+          "escalation_rate": 0.25
+        },
+        "0.0": {
+          "count": 80,
+          "metrics": {
+            "accuracy": 0.775,
+            "precision": 0.85,
+            "recall": 0.85,
+            "f1": 0.85,
+            "false_alarm_rate": 0.45,
+            "tp": 51,
+            "fp": 9,
+            "tn": 11,
+            "fn": 9
+          },
+          "avg_ops": 31471.25,
+          "avg_runtime_ms": 0.54592325,
+          "escalation_rate": 0.725
+        }
+      }
+    }
+  }
+}

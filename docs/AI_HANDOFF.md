@@ -2,24 +2,14 @@
 
 Use AI coding tools one phase at a time. The repository root `AGENTS.md` contains the project constraints. Start every prompt by asking the tool to read `AGENTS.md`, `README.md`, the phase plan, and the experiment specification.
 
-## Prompt for the next task: complete Phase 1 review
+## Current Phase and Completed Milestones
 
-Copy this prompt to Antigravity:
+- **Phases 1–5:** Completed. Signal generation, fixed baselines, adaptive selector, development review, CV study, protocol freezes (v1.0.0, v1.1.0, v1.2.0), and held-out test evaluations completed.
+- **Phase 6:** Embedded firmware demonstration port completed in `esp32_demo/` with 100% desktop C++ parity; Wokwi live simulation execution remains pending manual launch.
+- **Engineering Audit & Corrections:** Single-pass rFFT spectral extraction implemented; fair benchmarking completed across all methods under uniform warm timing; difficult-case investigation and independent validation of Candidate v1.2 completed; 5 report-ready figures and tables generated; formal prior art review documented in `docs/PRIOR_ART.md`.
+- **Phase 7 (Research Report):** Deferred until explicitly resumed by user.
 
-```text
-Work only on Phase 1 (signal and feature foundation) of this project. First read AGENTS.md, README.md, docs/PROJECT_PLAN.md, and docs/EXPERIMENT_SPEC.md.
-
-Inspect the existing Python files and generated preview outputs. Do not implement the three detector methods, the experiment runner, Wokwi firmware, or the report.
-
-Review Phase 1 for correctness and reproducibility. In particular:
-1. Confirm a fixed seed reproduces the same signal/metadata and that changing SNR changes noise while preserving the underlying clean recipe for each group/case.
-2. Confirm group IDs are disjoint between development and test, and all variants from a group stay together.
-3. Check labels, SNR construction, frequency targets, waveform/spectrum preview, and feature calculations on known signals.
-4. Fix only concrete Phase 1 defects. Avoid changing the scientific scope or silently changing definitions; document any necessary proposal first.
-5. Run appropriate checks or small reproducibility/feature checks, and report exact commands and outcomes.
-
-At the end, list changed files, checks run and results, remaining limitations, and any decision needed from the team. Do not claim physical validation or energy measurements.
-```
+## Prompt pattern for future work
 
 ## What to bring back for review
 

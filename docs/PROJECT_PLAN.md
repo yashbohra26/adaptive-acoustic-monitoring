@@ -113,22 +113,40 @@ Executed single frozen evaluation on the 20 held-out test source groups (320 win
   - Matches Fixed-High False-Alarm Rate exactly (0.1000 vs 0.1000).
   - 100% recall on impacts with 0.0% escalation (decided at Stage 1).
   - Matches Fixed-High on frequency shifts (80.00% recall).
-  - Misses 14 quiet added-harmonic windows at high SNR that score below Stage 1 normal threshold.
+  - **Quality Constraint Failure:** Failed pre-declared recall constraint ($0.8750 < 0.8833$) due to 14 quiet added-harmonic windows at high SNR scoring below Stage 1 normal threshold ($P_{\text{normal}} = 1.7714$).
 
 Full outputs: [`results/phase5_final_evaluation.json`](../results/phase5_final_evaluation.json) and [`results/phase5_window_predictions.csv`](../results/phase5_window_predictions.csv).
 
-## Phase 6 — Wokwi ESP32 demonstration (Completed)
+## Phase 6 — Wokwi ESP32 demonstration & Engineering Audit (Completed)
 
-Implemented a self-contained firmware demonstration of the frozen Candidate Selector v1.1 under `esp32_demo/`:
-- **Architecture:** Pure C++ core algorithm module ([`esp32_demo/src/adaptive_core.h`](../esp32_demo/src/adaptive_core.h)) implementing the exact Protocol v1.1.0 parameters and decision hierarchy, free of Arduino hardware dependencies.
-- **Wokwi Integration:** Complete PlatformIO configuration ([`esp32_demo/platformio.ini`](../esp32_demo/platformio.ini)), Wokwi configuration ([`esp32_demo/wokwi.toml`](../esp32_demo/wokwi.toml)), Wokwi board diagram ([`esp32_demo/diagram.json`](../esp32_demo/diagram.json)), and Arduino firmware sketch ([`esp32_demo/src/main.cpp`](../esp32_demo/src/main.cpp)).
-- **Deterministic Development Vectors:** 5 representative vectors exported strictly from development group `g0001` ([`esp32_demo/src/demo_vectors.h`](../esp32_demo/src/demo_vectors.h)) demonstrating both cheap Stage 1 early stops (clean normal, impact anomaly) and Stage 2 FFT escalations (frequency shift, high noise). Zero test data used.
-- **Verification:** 100% decision and stage parity between C++ and Python Protocol v1.1.0 verified via standalone desktop C++ test harness ([`esp32_demo/test_harness.cpp`](../esp32_demo/test_harness.cpp)) and automated Python test suite.
-- **Physical Reality Disclaimer:** This is an emulation/simulation demonstrating control flow on pre-buffered synthetic signals. It does not measure physical ESP32 power, battery life, analog transducer noise, or real-world industrial acoustic environments.
+1. **Embedded Firmware Port (`esp32_demo/`):**
+   - Pure C++ core algorithm module ([`esp32_demo/src/adaptive_core.h`](../esp32_demo/src/adaptive_core.h)) implementing the exact decision hierarchy, free of Arduino hardware dependencies.
+   - PlatformIO configuration ([`esp32_demo/platformio.ini`](../esp32_demo/platformio.ini)), Wokwi configuration ([`esp32_demo/wokwi.toml`](../esp32_demo/wokwi.toml)), Wokwi board diagram ([`esp32_demo/diagram.json`](../esp32_demo/diagram.json)), and Arduino firmware sketch ([`esp32_demo/src/main.cpp`](../esp32_demo/src/main.cpp)).
+   - 5 representative vectors exported strictly from development group `g0001` ([`esp32_demo/src/demo_vectors.h`](../esp32_demo/src/demo_vectors.h)) demonstrating both cheap Stage 1 early stops (clean normal, impact anomaly) and Stage 2 FFT escalations (frequency shift, high noise). Zero test data used.
+   - 100% decision and stage parity between C++ and Python Protocol v1.1.0 verified via standalone desktop C++ test harness ([`esp32_demo/test_harness.cpp`](../esp32_demo/test_harness.cpp)) and automated Python test suite.
+   - **Status:** C++ code parity 100% verified. Live simulation in Wokwi remains pending manual execution.
+
+2. **FFT Reuse and Operation Cost Model Alignment:**
+   - Single-pass rFFT spectral extraction implemented in `python/features.py` (`extract_spectral_features`), eliminating duplicate FFT execution in `FixedHighDetector.predict` and escalated adaptive windows.
+   - Strictly verified via mock unit tests that Fixed-High executes rFFT exactly 1 time, Stage 1 executes 0 rFFTs, and escalated windows execute exactly 1 rFFT.
+
+3. **Fair Three-Method Benchmarking:**
+   - Evaluated Fixed-Low, Fixed-High, and Candidate v1.1 under strictly uniform conditions (5 warmup runs, 25 timing repetitions per window using `time.perf_counter_ns()`).
+   - Recorded desktop Python runtime: Fixed-Low ($0.162$ ms), Fixed-High ($0.468$ ms), Candidate v1.1 ($0.447$ ms, $-4.4\%$ vs Fixed-High).
+   - Saved full data in [`results/benchmark_fair_evaluation.json`](../results/benchmark_fair_evaluation.json) and [`results/benchmark_fair_windows.csv`](../results/benchmark_fair_windows.csv).
+
+4. **Candidate v1.2 Development Study & Independent Holdout:**
+   - Diagnosed harmonic failure mode on development data using 5-fold grouped cross-validation.
+   - Selected $P_{\text{normal}} = \text{p50} = 1.3110$, freezing Protocol v1.2.0 in [`results/evaluation_protocol_v1.2.json`](../results/evaluation_protocol_v1.2.json) before evaluation.
+   - Evaluated on a freshly generated independent held-out dataset (20 groups, seed=20261014, SHA-256 `5b918927...`): Fixed-High F1 0.9534, Recall 0.9375; Candidate v1.2 F1 0.9534, Recall 0.9375, FAR 0.0875, 28,729 ops (+1.78% savings), meeting all pre-declared quality constraints ([`results/candidate_v1.2_independent_evaluation.json`](../results/candidate_v1.2_independent_evaluation.json)).
+
+5. **Publication-Ready Figures & Prior Art:**
+   - Generated 5 publication figures in [`results/figures/`](../results/figures/) and summary tables in [`results/tables/`](../results/tables/).
+   - Synthesized comprehensive prior art review in [`docs/PRIOR_ART.md`](PRIOR_ART.md).
 
 ## Phase 7 — Report and presentation (Deferred)
 
-Deferred until explicitly requested by user. Do not invent favorable outcomes: include cases where the adaptive approach loses or fails.
+Deferred until explicitly requested by user. Do not invent favorable outcomes: report Candidate v1.1's harmonic recall failure transparently alongside Candidate v1.2's independent validation.
 
 ## Team workflow with Antigravity
 

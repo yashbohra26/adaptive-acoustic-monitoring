@@ -49,17 +49,18 @@ Frequency-estimation ground truth is meaningful only for stable single-tone norm
 - **Work accounting (Operation-Count Proxy):**
   - `stage_reached`: `"stage1_low"` or `"stage2_high"`.
   - `fft_used`: Boolean indicator recorded for every window.
-  - `op_count_proxy`: Operation-count proxy including selector overhead:
+  - `op_count_proxy`: Operation-count proxy strictly matching executed stage operations:
     - Stage 1 alone: \(10 N + 25\) ops (\(10,265\) ops for \(N=1024\)).
     - Fixed-High standalone: \(2.5 N \log_2(N) + 3.5 N + 66\) ops (\(29,250\) ops for \(N=1024\)).
     - Stage 2 cumulative (escalated window): Stage 1 + Stage 2 = \(10,265 + 29,250 = 39,515\) ops.
     - Adaptive weighted mean: \((N_{\text{stage1}} \times 10,265 + N_{\text{stage2}} \times 39,515) / N_{\text{total}}\).
-    - For development pilot: \((606 \times 10,265 + 354 \times 39,515) / 960 = 21,050.9\) ops/window (\(-28.0\%\) relative to standalone Fixed-High).
-  - Desktop execution time in milliseconds recorded separately from operation counts. Neither represents physical hardware energy.
-- **Protocol Freeze:** Historical v1.0 specified and frozen in [`docs/EVALUATION_PROTOCOL.md`](EVALUATION_PROTOCOL.md) and [`results/evaluation_protocol.json`](../results/evaluation_protocol.json). Active Protocol v1.1.0 frozen in [`results/evaluation_protocol_v1.1.json`](../results/evaluation_protocol_v1.1.json).
-- **Candidate Selector v1.1 Investigation:** Fully analyzed in [`docs/PHASE4_INVESTIGATION.md`](PHASE4_INVESTIGATION.md) and evaluated via 5-fold CV (`cand_v1.1_p60_anomaly_first` in `python/candidate_selector.py`).
-- **Phase 5 Held-Out Evaluation:** Completed on the 20 held-out test source groups (320 windows). Fixed-High F1 0.9492 (29,250 ops); Candidate v1.1 F1 0.9170, Recall 0.8750, FAR 0.1000, 26,992.3 ops/window (+7.72% operational savings). Documented in [`results/phase5_final_evaluation.json`](../results/phase5_final_evaluation.json).
-- **Phase 6 Embedded Demonstration:** Implemented under `esp32_demo/` for Wokwi ESP32 emulation, porting the frozen Protocol v1.1.0 decision hierarchy. Verified 100% decision and stage parity on 5 deterministic development vectors from Group `g0001` ([`esp32_demo/README.md`](../esp32_demo/README.md)).
+  - Single-pass FFT implementation (`extract_spectral_features` in `python/features.py`) unifies 16-band normalized energy and FFT peak frequency into a single rFFT call, eliminating duplicate FFT execution and strictly aligning code execution with the 29,250 ops proxy model.
+  - Desktop execution time measured under uniform benchmark conditions (5 warmup iterations, 25 timing repetitions per window using `time.perf_counter_ns()`). Reported separately from operation counts. Neither represents physical hardware energy.
+- **Protocol Versions:**
+  - **Protocol v1.0.0 (Historical):** Frozen in [`results/evaluation_protocol.json`](../results/evaluation_protocol.json).
+  - **Protocol v1.1.0 (Phase 5 Reference):** Frozen in [`results/evaluation_protocol_v1.1.json`](../results/evaluation_protocol_v1.1.json). Evaluated on original 20 held-out test groups (320 windows, SHA-256 `b99e0b36...`). Fixed-High: F1 0.9492, Recall 0.9333, FAR 0.1000, 29,250 ops. Candidate v1.1: F1 0.9170, Recall 0.8750 (recall constraint $< 0.8833$ not met due to subtle harmonic misses), FAR 0.1000, 26,992.3 ops/window (+7.72% operational savings). Documented in [`results/phase5_final_evaluation.json`](../results/phase5_final_evaluation.json).
+  - **Protocol v1.2.0 (Harmonic-Sensitive Candidate):** Frozen in [`results/evaluation_protocol_v1.2.json`](../results/evaluation_protocol_v1.2.json) following development-only 5-fold cross-validation ($P_{\text{normal}} = \text{p50} = 1.3110$). Evaluated on a fresh independent held-out partition (20 new groups, seed=20261014, SHA-256 `5b918927...`): Fixed-High F1 0.9534, Recall 0.9375; Candidate v1.2 F1 0.9534, Recall 0.9375, FAR 0.0875, 28,729.1 ops/window (+1.78% savings), meeting all pre-declared quality constraints. Documented in [`results/candidate_v1.2_independent_evaluation.json`](../results/candidate_v1.2_independent_evaluation.json).
+- **Phase 6 Embedded Demonstration:** Implemented under `esp32_demo/` for Wokwi ESP32 emulation, porting the frozen decision hierarchy. Verified 100% decision and stage parity on 5 deterministic development vectors from Group `g0001` ([`esp32_demo/README.md`](../esp32_demo/README.md)). Live Wokwi simulation remains pending manual launch.
 
 ### Shared requirements
 

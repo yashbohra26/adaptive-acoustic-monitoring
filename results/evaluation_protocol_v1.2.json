@@ -1,0 +1,21 @@
+{
+  "protocol_version": "1.2.0",
+  "description": "Pre-test freeze of Candidate Selector v1.2 addressing difficult added harmonic cases",
+  "reference_detector_fixed_high": {
+    "num_bands": 16,
+    "threshold": 55.309465532998374,
+    "ops_per_window": 29250
+  },
+  "candidate_v1.2": {
+    "p_normal_percentile": 50.0,
+    "p_anomaly_multiplier": 1.2,
+    "frozen_boundaries": {
+      "low_score_p_normal": 1.3110276209459872,
+      "low_score_p_anomaly": 7.140502430084831,
+      "zcf_min": 173.59375,
+      "zcf_max": 263.90625
+    },
+    "stage1_ops": 10265,
+    "stage2_cumulative_ops": 39515
+  }
+}

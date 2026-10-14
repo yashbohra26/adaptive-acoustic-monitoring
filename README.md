@@ -1,18 +1,18 @@
 # Adaptive Acoustic Signal Processing for Machine Monitoring
 
-> **Project status:** Phase 4 reopened for development-only selector review. A 5-fold grouped cross-validation candidate search has diagnosed the recall failure mode and identified the accuracy-work Pareto trade-off. Held-out test data (20 groups) remains strictly locked. Phase 5, Phase 6, and Phase 7 remain unexecuted/deferred.
+> **Project status:** Phase 5 held-out evaluation and Phase 6 embedded firmware port completed. Redundant FFT computation resolved; operation cost proxy audited and aligned. Fair three-method benchmarking completed with repeated warm desktop timing. Automated quality constraint checks enforce zero duplicate FFTs and transparent constraint reporting. Development-only investigation identified Candidate v1.2, frozen under Protocol v1.2.0 and validated on an independent holdout. Wokwi live simulation remains pending manual execution. Phase 7 research report remains deferred.
 
 ## Project in one minute
 
-We are building a software-only study of whether a context-aware algorithm can analyze simulated machine-like sounds with less computational work while retaining useful detection and frequency-estimation quality. Python is the main experimental platform. Wokwi will later demonstrate the selection flow on a simulated ESP32.
+We are building a software-only study of whether a context-aware algorithm can analyze simulated machine-like sounds with less computational work while retaining useful detection and frequency-estimation quality. Python is the main experimental platform. Wokwi will demonstrate the selection flow on a simulated ESP32.
 
-We plan to compare three methods on the same labelled signal windows:
+We compare three methods on the same labelled signal windows:
 
-1. **Fixed-low:** use inexpensive signal features and a calibrated rule.
-2. **Fixed-high:** always use a specified FFT-based analysis and calibrated rule.
-3. **Adaptive:** begin with inexpensive features and escalate to FFT when the evidence is uncertain.
+1. **Fixed-low:** uses inexpensive time-domain features (log RMS, log crest factor, log kurtosis) and zero-crossing frequency ($10,265$ ops proxy).
+2. **Fixed-high:** always uses Hann-windowed single-pass rFFT spectral analysis and 16-band normalized energy ($29,250$ ops proxy).
+3. **Adaptive:** begins with inexpensive time-domain features and escalates to spectral FFT when evidence is ambiguous or indicates frequency deviation ($10,265$ ops if Stage 1; $39,515$ ops if escalated).
 
-The adaptive method must show both its output quality and how often it escalates. Python runtime and estimated operation counts will be reported separately. Neither is a measurement of ESP32 energy use.
+The adaptive method must demonstrate both its output quality and its computational efficiency. Python desktop runtime and algorithmic operation-count proxy are reported separately. Neither represents physical ESP32 energy consumption.
 
 ## Research question
 
@@ -22,22 +22,19 @@ This is a hypothesis to test, not a result we assume in advance. Simulation resu
 
 ## Current build
 
-- [Configuration](python/config.py): sample rate, duration, case ranges, SNRs, split fraction, and reproducible seed.
+- [Configuration](python/config.py): sample rate (4000 Hz), window duration (0.256 s, 1024 samples), case ranges, SNRs (30, 20, 10, 0 dB), and reproducible seeds.
 - [Signal generator](python/generate_signals.py): creates normal, frequency-shift, added-harmonic, and impact windows with known labels, parameters, and grouped development (fit/calibration) / test splits.
-- [Feature functions](python/features.py): RMS, crest factor, kurtosis, zero-crossing frequency, FFT peak estimate, and normalized band energies (16 bands, 0-1200 Hz).
-- [Baseline detectors](python/baselines.py): Fixed-Low (log time-domain features) and Fixed-High (16-band normalized spectral energies) with robust distance scoring and calibrated thresholds.
-- [Adaptive selector](python/adaptive_selector.py): two-stage context-aware detector with deterministic escalation boundaries and complete work accounting.
-- [Phase 2 pilot runner](python/run_phase2_pilot.py): generates 80-group pilot dataset, fits reference models on fit groups, and calibrates thresholds on calibration groups.
-- [Phase 3 pilot runner](python/run_phase3_pilot.py): derives adaptive boundaries and evaluates development-only escalation distributions by case and SNR.
-- [Phase 4 development review](python/run_phase4_review.py): executes development-only diagnostic review across all three methods with group-level bootstrap CIs.
-- [Phase 4 grouped CV study](python/run_phase4_study.py): executes 5-fold grouped cross-validation candidate search across 12 selector configurations.
-- [Evaluation protocol](docs/EVALUATION_PROTOCOL.md) & [machine-readable protocol](results/evaluation_protocol.json): v1.0 baseline and Section 4 candidate analysis.
-- [CV study results](results/phase4_study/selector_study_results.json): out-of-fold metrics and quality constraint evaluation.
-- [Phase plan](docs/PROJECT_PLAN.md): deliverables and acceptance checks for each phase.
-- [Experiment specification](docs/EXPERIMENT_SPEC.md): shared rules, baseline rules, and adaptive selector policy.
-- [AI handoff guide](docs/AI_HANDOFF.md): how to use Antigravity and return its changes for review.
-- [AI project instructions](AGENTS.md): concise context and constraints for coding agents.
-- [Contributing guide](CONTRIBUTING.md): setup, collaboration, and change-review instructions for teammates.
+- [Feature functions](python/features.py): RMS, crest factor, kurtosis, zero-crossing frequency, FFT peak estimate, normalized band energies, and unified single-pass `extract_spectral_features`.
+- [Baseline detectors](python/baselines.py): Fixed-Low and Fixed-High baseline detectors with single-pass FFT execution and calibrated thresholds.
+- [Adaptive selector](python/adaptive_selector.py): historical Protocol v1.0 two-stage detector.
+- [Candidate selector](python/candidate_selector.py): Candidate v1.1 and v1.2 two-stage selector implementing the anomaly-first decision cascade.
+- [Fair benchmarking harness](python/benchmark_methods.py): uniform benchmark across all methods with 5 warmup runs and 25 timing repetitions per window.
+- [Difficult-case investigation](python/investigate_difficult_cases.py): development-only CV study, Protocol v1.2.0 freeze, and independent holdout evaluation.
+- [Plot & table generator](python/plot_evaluation_results.py): generates publication figures (PNG/PDF) and summary tables (CSV/Markdown).
+- [Phase 2–5 evaluation runners](python/): reproducible pipelines for pilots, development review, CV studies, and final test evaluation.
+- [ESP32 demonstration](esp32_demo/): pure C++ embedded decision flow with 100% desktop parity; Wokwi platform configuration and demo vectors.
+- [Literature review](docs/PRIOR_ART.md): formal prior art review covering Viola-Jones cascades, BranchyNet early-exits, and Randall-Antoni machinery diagnostics.
+- [Automated quality constraints](tests/test_quality_constraints.py): 39 comprehensive unit tests verifying zero duplicate FFTs, cost accounting, split disjointness, and constraint reporting.
 
 ## Run the current signal-generation milestone
 
@@ -77,6 +74,9 @@ adaptive-acoustic-monitoring/
 │   ├── baselines.py
 │   ├── adaptive_selector.py
 │   ├── candidate_selector.py
+│   ├── benchmark_methods.py
+│   ├── investigate_difficult_cases.py
+│   ├── plot_evaluation_results.py
 │   ├── run_phase2_pilot.py
 │   ├── run_phase3_pilot.py
 │   ├── run_phase4_review.py
@@ -95,17 +95,29 @@ adaptive-acoustic-monitoring/
 │       ├── adaptive_core.h
 │       └── demo_vectors.h
 ├── results/
+│   ├── figures/
+│   │   ├── fig1_overall_performance.png / .pdf
+│   │   ├── fig2_work_and_runtime.png / .pdf
+│   │   ├── fig3_case_and_snr_recall.png / .pdf
+│   │   ├── fig4_adaptive_escalation.png / .pdf
+│   │   └── fig5_error_breakdown.png / .pdf
+│   ├── tables/
+│   │   ├── overall_performance_table.md / .csv
+│   │   └── case_breakdown_table.md / .csv
 │   ├── preview/
 │   ├── phase2_pilot/
 │   ├── phase3_pilot/
 │   ├── phase4_review/
 │   ├── phase4_study/
-│   │   ├── identifiability_audit.json
-│   │   └── selector_study_results.json
 │   ├── evaluation_protocol.json
 │   ├── evaluation_protocol_v1.1.json
+│   ├── evaluation_protocol_v1.2.json
 │   ├── phase5_final_evaluation.json
-│   └── phase5_window_predictions.csv
+│   ├── phase5_window_predictions.csv
+│   ├── benchmark_fair_evaluation.json
+│   ├── benchmark_fair_windows.csv
+│   ├── candidate_v1.2_development_study.json
+│   └── candidate_v1.2_independent_evaluation.json
 ├── tests/
 │   ├── test_phase1.py
 │   ├── test_phase2.py
@@ -114,13 +126,26 @@ adaptive-acoustic-monitoring/
 │   ├── test_phase4_cv.py
 │   ├── test_phase4_investigation.py
 │   ├── test_phase5.py
-│   └── test_phase6_wokwi.py
+│   ├── test_phase6_wokwi.py
+│   └── test_quality_constraints.py
 └── docs/
     ├── PROJECT_PLAN.md
     ├── EXPERIMENT_SPEC.md
     ├── EVALUATION_PROTOCOL.md
     ├── PHASE4_INVESTIGATION.md
+    ├── PRIOR_ART.md
     └── AI_HANDOFF.md
 ```
 
-Phase 6 (`esp32_demo/`) provides a software-only firmware demonstration of Candidate Selector v1.1 for Wokwi. Phase 7 (research report) remains deferred.
+### Phase Status Overview
+
+- **Phase 1 (Signal Foundation):** Complete (`476ae37`).
+- **Phase 2 (Fixed Baselines):** Complete (`17bece2`).
+- **Phase 3 (Adaptive Selector v1.0):** Complete (`fe9b757`).
+- **Phase 4 (Audit & Protocol v1.1.0 Freeze):** Complete (`0dc2b39`, `97614a2`, `02bf90f`, `3e242ee`).
+- **Phase 5 (Held-Out Test Evaluation):** Complete (`1a283ae`). Candidate v1.1 achieved F1 = 0.9170, Recall = 0.8750 (recall constraint $< 0.8833$ not met on subtle harmonics), Ops = 26,992.3 (+7.72% savings).
+- **Phase 6 (Embedded Firmware Port):** Complete (`ac46a12`, `7856ac8`). C++ desktop harness passes with 100% parity; Wokwi live simulation execution remains pending manual launch.
+- **FFT Refactoring & Fair Benchmark:** Single-pass spectral extraction implemented, eliminating duplicate FFT execution. Benchmarked with 5 warmup runs and 25 timing repetitions per window.
+- **Candidate v1.2 Development Study & Independent Holdout:** Development CV selected $P_{\text{normal}} = \text{p50}$, frozen under Protocol v1.2.0, resolving harmonic misses and matching Fixed-High quality on an independent holdout (seed 20261014).
+- **Phase 7 (Research Report):** Deferred per project instructions.
+

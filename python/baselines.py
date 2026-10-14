@@ -23,6 +23,7 @@ from features import (
     zero_crossing_frequency,
     fft_peak_frequency,
     normalized_band_energies,
+    extract_spectral_features,
 )
 
 
@@ -231,12 +232,21 @@ class FixedHighDetector:
         return self.threshold
 
     def predict(self, x: np.ndarray) -> BaselineResult:
-        """Classify a window and return anomaly score, label, and FFT peak frequency."""
-        if self.threshold is None:
+        """Classify a window and return anomaly score, label, and FFT peak frequency.
+
+        Reuses a single rFFT computation for both normalized band energies and peak frequency.
+        """
+        if self.threshold is None or self.reference_median is None or self.reference_scale is None:
             raise RuntimeError("Detector must be calibrated before prediction")
-        score = self.score_window(x)
+        vec, f_est = extract_spectral_features(
+            x,
+            self.sample_rate_hz,
+            freq_min_hz=self.freq_min_hz,
+            freq_max_hz=self.freq_max_hz,
+            num_bands=self.num_bands,
+        )
+        score = float(standardized_distance(vec, self.reference_median, self.reference_scale))
         pred = int(score > self.threshold)
-        f_est = fft_peak_frequency(x, self.sample_rate_hz)
         return BaselineResult(
             method="fixed_high",
             anomaly_score=score,

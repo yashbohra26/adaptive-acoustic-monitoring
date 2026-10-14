@@ -1,0 +1,5 @@
+Method,Accuracy,Precision,Recall,F1 Score,False Alarm Rate,Freq MAE (Hz),Avg Ops Proxy,Ops Savings (%),Mean Runtime (ms),Escalation Rate (%)
+Fixed-Low (Standalone),0.5281,0.9406,0.3958,0.5572,0.0750,91.44,"10,265.0",+64.91%,0.1623 +- 0.0743,0.00%
+Fixed-High (Standalone),0.9250,0.9655,0.9333,0.9492,0.1000,0.85,"29,250.0",+0.00%,0.4676 +- 0.1952,100.00%
+Candidate v1.1 (Protocol v1.1.0),0.8812,0.9633,0.8750,0.9170,0.1000,2.75,"26,992.3",+7.72%,0.4468 +- 0.3246,57.19%
+Historical Adaptive v1.0,0.5750,0.9262,0.4708,0.6243,0.1125,38.37,"21,416.6",+26.78%,0.3737 +- 0.3277,38.12%

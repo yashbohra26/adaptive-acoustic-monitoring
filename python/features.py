@@ -102,3 +102,57 @@ def normalized_band_energies(
 
     return band_energies
 
+
+def extract_spectral_features(
+    x: np.ndarray,
+    sample_rate_hz: int,
+    freq_min_hz: float = 0.0,
+    freq_max_hz: float = 1200.0,
+    num_bands: int = 16,
+) -> tuple[np.ndarray, float]:
+    """Compute normalized band energies AND peak frequency in a single rFFT pass.
+
+    Eliminates duplicate windowing and rFFT computation while preserving exact
+    feature values.
+    Returns:
+        (band_energies, peak_freq_hz)
+    """
+    x = np.asarray(x, dtype=float)
+    if len(x) < 4:
+        return np.zeros(num_bands, dtype=float), 0.0
+
+    n = len(x)
+    windowed = (x - np.mean(x)) * np.hanning(n)
+    spectrum = np.abs(np.fft.rfft(windowed))
+
+    # Peak frequency: strongest non-DC bin
+    if len(spectrum) < 2:
+        peak_freq_hz = 0.0
+    else:
+        peak_idx = int(np.argmax(spectrum[1:]) + 1)
+        peak_freq_hz = float(peak_idx * sample_rate_hz / n)
+
+    # 16-band normalized energy accumulation
+    power = spectrum**2
+    freqs = np.fft.rfftfreq(n, 1.0 / sample_rate_hz)
+    band_edges = np.linspace(freq_min_hz, freq_max_hz, num_bands + 1)
+    band_energies = np.zeros(num_bands, dtype=float)
+
+    for i in range(num_bands):
+        f_low = band_edges[i]
+        f_high = band_edges[i + 1]
+        if i == num_bands - 1:
+            idx = (freqs >= f_low) & (freqs <= f_high)
+        else:
+            idx = (freqs >= f_low) & (freqs < f_high)
+        if np.any(idx):
+            band_energies[i] = float(np.sum(power[idx]))
+
+    total_energy = float(np.sum(band_energies))
+    if total_energy > 1e-12:
+        band_energies = band_energies / total_energy
+    else:
+        band_energies = np.zeros(num_bands, dtype=float)
+
+    return band_energies, peak_freq_hz
+
