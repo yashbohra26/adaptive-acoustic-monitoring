@@ -208,9 +208,10 @@ inline void fft_radix2(float* real, float* imag, int n) {
     }
 
     // Butterfly stages
-    const float PI = 3.14159265358979323846f;
+    // Avoid the global PI macro defined by Arduino.h in the firmware build.
+    const float PI_RAD = 3.14159265358979323846f;
     for (int len = 2; len <= n; len <<= 1) {
-        float angle = -2.0f * PI / static_cast<float>(len);
+        float angle = -2.0f * PI_RAD / static_cast<float>(len);
         float wlen_r = std::cos(angle);
         float wlen_i = std::sin(angle);
         int half = len >> 1;
@@ -248,7 +249,8 @@ inline void compute_fixed_high_features(
     float* band_energies,
     float* peak_freq_hz
 ) {
-    const float PI = 3.14159265358979323846f;
+    // Avoid the global PI macro defined by Arduino.h in the firmware build.
+    const float PI_RAD = 3.14159265358979323846f;
 
     // 1. Mean-center and Hann window
     float sum = 0.0f;
@@ -263,7 +265,7 @@ inline void compute_fixed_high_features(
 
     for (int i = 0; i < n; ++i) {
         // Hann window: 0.5 * (1 - cos(2*pi*i / (n - 1)))
-        float w = 0.5f - 0.5f * std::cos(2.0f * PI * static_cast<float>(i) / static_cast<float>(n - 1));
+        float w = 0.5f - 0.5f * std::cos(2.0f * PI_RAD * static_cast<float>(i) / static_cast<float>(n - 1));
         real[i] = (x[i] - mean) * w;
         imag[i] = 0.0f;
     }
