@@ -79,7 +79,7 @@ def test_split_group_disjointness(dev_and_test_data):
     assert len(dev_groups.intersection(test_groups)) == 0, "Data leakage! Dev and test groups overlap!"
 
 
-def test_no_duplicate_fft_execution(fitted_detectors):
+def test_no_duplicate_fft_execution(fitted_detectors, dev_and_test_data):
     """Verify that Fixed-High computes rFFT exactly once and adaptive does not duplicate rFFT."""
     low_det, high_det, cand_det = fitted_detectors
     x = np.random.default_rng(42).standard_normal(1024)
@@ -94,30 +94,44 @@ def test_no_duplicate_fft_execution(fitted_detectors):
         high_det.predict(x)
         assert mock_rfft.call_count == 1, f"Fixed-High called rFFT {mock_rfft.call_count} times; expected exactly 1 (duplicate FFT bug!)"
 
-    # 3. Candidate v1.1 on confident normal window: must call rFFT 0 times
-    # A low amplitude signal is well within normal bounds
-    clean_normal = np.sin(2.0 * np.pi * 200.0 * np.arange(1024) / 4000.0) * 0.7
+    # 3. Use the most normal-like 30 dB calibration example so the check follows
+    # the frozen calibration behavior instead of guessing a synthetic amplitude.
+    records, signals = dev_and_test_data
+    calibration_normals = [
+        signals[r["signal_key"]]
+        for r in records
+        if r["split"] == "development"
+        and r["dev_subset"] == "calibration"
+        and r["case"] == "normal"
+        and r["snr_db"] == 30.0
+    ]
+    clean_normal = min(calibration_normals, key=cand_det.fixed_low.score_window)
     with patch("numpy.fft.rfft", wraps=np.fft.rfft) as mock_rfft:
         res = cand_det.predict(clean_normal)
-        if res.stage_reached == "stage1_low":
-            assert mock_rfft.call_count == 0, f"Adaptive Stage 1 called rFFT {mock_rfft.call_count} times; expected 0"
-            assert res.op_count_proxy == 10265
-            assert not res.fft_used
+        assert res.stage_reached == "stage1_low", "Calibration fixture no longer exercises adaptive early exit"
+        assert mock_rfft.call_count == 0, f"Adaptive Stage 1 called rFFT {mock_rfft.call_count} times; expected 0"
+        assert res.op_count_proxy == 10265
+        assert not res.fft_used
 
     # 4. Candidate v1.1 on frequency-shifted window: must escalate and call rFFT EXACTLY ONCE
     shifted = np.sin(2.0 * np.pi * 350.0 * np.arange(1024) / 4000.0)
     with patch("numpy.fft.rfft", wraps=np.fft.rfft) as mock_rfft:
         res = cand_det.predict(shifted)
-        if res.stage_reached == "stage2_high":
-            assert mock_rfft.call_count == 1, f"Adaptive Stage 2 called rFFT {mock_rfft.call_count} times; expected 1"
-            assert res.op_count_proxy == 39515
-            assert res.fft_used
+        assert res.stage_reached == "stage2_high", "Out-of-range tone must exercise adaptive escalation"
+        assert mock_rfft.call_count == 1, f"Adaptive Stage 2 called rFFT {mock_rfft.call_count} times; expected 1"
+        assert res.op_count_proxy == 39515
+        assert res.fft_used
 
 
 def test_operation_cost_accounting_invariants(fitted_detectors):
     """Verify that operation counts strictly adhere to the documented cost model."""
     low_det, high_det, cand_det = fitted_detectors
     rng = np.random.default_rng(123)
+    n = 1024
+    expected_low_ops = 10 * n + 25
+    expected_high_ops = int(2.5 * n * np.log2(n) + 3.5 * n + 66)
+    assert expected_low_ops == 10265
+    assert expected_high_ops == 29250
 
     for _ in range(50):
         x = rng.standard_normal(1024)
@@ -133,10 +147,10 @@ def test_operation_cost_accounting_invariants(fitted_detectors):
         # Candidate
         res_c = cand_det.predict(x)
         if res_c.stage_reached == "stage1_low":
-            assert res_c.op_count_proxy == 10265, "Stage 1 operation count proxy must be 10,265"
+            assert res_c.op_count_proxy == expected_low_ops, "Stage 1 operation count proxy must match 10*N+25"
             assert not res_c.fft_used
         elif res_c.stage_reached == "stage2_high":
-            assert res_c.op_count_proxy == 39515, "Escalated operation count proxy must be 39,515 (10,265 + 29,250)"
+            assert res_c.op_count_proxy == expected_low_ops + expected_high_ops, "Escalated count must include Stage 1 and the single-pass Stage 2 cost"
             assert res_c.fft_used
         else:
             pytest.fail(f"Invalid stage reached: {res_c.stage_reached}")

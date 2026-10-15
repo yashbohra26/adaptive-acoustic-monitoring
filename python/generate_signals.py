@@ -12,6 +12,23 @@ from config import DEFAULT_CONFIG, SIGNAL_CASES, StudyConfig
 from features import extract_features
 
 
+def assert_disjoint_source_group_splits(records: list[dict]) -> None:
+    """Fail if a source group occurs in both development and held-out records."""
+    groups_by_split: dict[str, set[str]] = {"development": set(), "test": set()}
+    for record in records:
+        split = record.get("split")
+        if split in groups_by_split:
+            groups_by_split[split].add(str(record["group_id"]))
+
+    overlap = groups_by_split["development"] & groups_by_split["test"]
+    if overlap:
+        examples = ", ".join(sorted(overlap)[:5])
+        raise AssertionError(
+            "Source-group leakage: development and held-out test splits share "
+            f"{len(overlap)} group(s): {examples}"
+        )
+
+
 def synthesize_case(case: str, f0: float, snr_db: float, rng: np.random.Generator,
                     noise_rng: np.random.Generator | None = None,
                     config: StudyConfig = DEFAULT_CONFIG) -> tuple[np.ndarray, float | None]:
@@ -106,6 +123,7 @@ def build_dataset(
                     "n_samples": len(x),
                     "signal_key": key,
                 })
+    assert_disjoint_source_group_splits(records)
     return records, signals
 
 

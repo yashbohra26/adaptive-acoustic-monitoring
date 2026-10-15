@@ -116,7 +116,7 @@ To eliminate variant leakage across splits, all 16 variants of a source group (4
 - **Weighted Average Ops:** \(\frac{N_{\text{stage1}} \times 10,265 + N_{\text{stage2}} \times 39,515}{N_{\text{total}}}\).
 - **Savings vs. Fixed-High:** \(\frac{29,250 - \text{Weighted Ops}}{29,250} \times 100\%\).
 - **Break-Even Limit:** Positive savings requires escalation rate \(E < \frac{29,250 - 10,265}{29,250} = \mathbf{64.91\%}\).
-- **Desktop Runtime:** Measured per window using `time.perf_counter()` and reported separately in milliseconds. Neither operation counts nor runtime represent physical ESP32 energy.
+- **Desktop Runtime:** The original Phase 5 artifact is retained for historical quality and operation-count results; its standalone baseline zeroes are placeholders and its adaptive per-call times are not comparable. Use the separate fair benchmark artifact for runtime comparisons: all four implementations use 5 warmups and 25 timed repetitions per window with `time.perf_counter_ns()`. Runtime is reported separately from the operation-count proxy. Neither represents physical ESP32 energy.
 
 ### 3.4 Group-Level Bootstrap Confidence Intervals
 To account for clustering across the 20 source groups in the test set:
@@ -134,3 +134,40 @@ Before opening test data, development checks confirmed:
 - 5-fold grouped cross-validation independently selected `cand_v1.1_p60_anomaly_first` over all 12 candidate configurations.
 - All 28 project unit tests pass.
 - Test split hash verified: `b99e0b36ea5b6659`.
+
+## 5. Acceptance, Screening, and Interpretation of Results
+
+### 5.1 Software and protocol-integrity checks
+
+Passing the Python/C++ test suite establishes only that the tested software behaviors, accounting invariants, artifact checks, and parity checks pass. It does **not** establish that an adaptive method meets the scientific objective or supports the research hypothesis. A test that confirms an expected quality-criterion failure is reported correctly can pass while that candidate still fails the criterion.
+
+### 5.2 Candidate-screening rule recorded in Phase 4
+
+The Phase 4 study script and its tests explicitly define candidate screening relative to Fixed-High on the same development out-of-fold (OOF) predictions:
+
+- F1 at least Fixed-High F1 minus 0.05.
+- Recall at least Fixed-High recall minus 0.05.
+- FAR no greater than Fixed-High FAR plus 0.01.
+- Average operation-count proxy strictly below 29,250 ops/window.
+
+Applied to the Phase 4 OOF Fixed-High results, this rule yields the saved numeric cutoffs F1 ≥ 0.9043509, recall ≥ 0.8791667, and FAR ≤ 0.0641667, with ops < 29,250. These numbers are explicitly recorded in `results/phase4_study/selector_study_results.json`; they are the OOF-derived screening limits, not separately documented as frozen final-evaluation thresholds.
+
+### 5.3 Final scientific acceptance rule: unresolved protocol decision
+
+The project record does not establish which form of the Phase 4 screening rule governs the final scientific claim. The Phase 4 implementation and prose support the **relative-to-Fixed-High margins** as the intended candidate-screening concept. However, the v1.1/v1.2 frozen machine-readable protocols do not specify a final acceptance section, and `docs/EVALUATION_PROTOCOL.md` originally specified evaluation methods and metrics without selecting either (a) frozen numeric OOF anchors or (b) margins recomputed against Fixed-High on each evaluation dataset as the final claim gate. The current quality tests and saved v1.2 status apply the latter. This implementation behavior is evidence of what was computed, not proof of an approved final scientific decision rule.
+
+Until the researchers/supervisor resolve this decision, neither interpretation should be presented as the authoritative final scientific acceptance rule. Preserve both reported interpretations; do not select one because it gives a more favorable candidate result. The fixed Phase 4 anchors and same-evaluation comparison rule are stated here for auditability, not as a retroactive threshold change.
+
+| Saved evaluation | Candidate | Fixed Phase 4 anchors: F1 / recall / FAR / ops | Same-evaluation Fixed-High margins: F1 / recall / FAR / ops |
+|---|---|---|---|
+| Phase 5, Protocol 1.1.0 | v1.1 | Pass / **Fail** / **Fail** / Pass | Pass / **Fail** / Pass / Pass |
+| Independent, Protocol 1.2.0 | v1.1 | Pass / **Fail** / **Fail** / Pass | Pass / **Fail** / Pass / Pass |
+| Independent, Protocol 1.2.0 | v1.2 | Pass / Pass / **Fail** / Pass | Pass / Pass / Pass / Pass |
+
+The fixed-anchor outcomes use the Phase 4 OOF numeric cutoffs above. The same-evaluation outcomes use the evaluated Fixed-High point metrics minus/plus the pre-existing margins (0.05/0.01); the operation limit is unchanged. In particular, v1.1 fails recall under either comparison, and v1.2's independent point results pass all four same-evaluation margins but fail the fixed FAR anchor. Its observed operation savings are 1.78%, with a saved 95% group-bootstrap interval from -1.66% to +4.91%, which includes zero. No equivalence or reliably positive savings is established by that interval.
+
+### 5.4 Exploratory and independent-evaluation findings
+
+Candidate v1.1's Phase 5 result is the frozen Protocol 1.1.0 evaluation; its recall shortfall (0.8750 versus the same-evaluation floor 0.8833) must remain visible. Candidate v1.2's saved result is an independent-holdout evaluation under Protocol 1.2.0, reported separately and not pooled with Phase 5. Its artifact's `meets_quality_constraints: "YES"` records the same-evaluation comparison calculation only. It does not resolve the final rule or convert the independent result into an approved confirmatory scientific claim. The independent holdout is historical evidence and must not be reused for tuning.
+
+The 128-window `work/local_build_preview` dataset is for smoke testing only and is not evidence for either screening or scientific acceptance. Operation counts are algorithmic proxies, not physical energy measurements. No physical ESP32 validation, live microphone result, or measured energy saving is claimed.

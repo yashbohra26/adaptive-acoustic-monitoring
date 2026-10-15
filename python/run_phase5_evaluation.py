@@ -18,6 +18,9 @@ import argparse
 import csv
 import hashlib
 import json
+import platform
+import subprocess
+import sys
 from pathlib import Path
 from collections import defaultdict
 import numpy as np
@@ -27,6 +30,10 @@ from generate_signals import build_dataset
 from baselines import FixedLowDetector, FixedHighDetector
 from adaptive_selector import AdaptiveSelector
 from candidate_selector import CandidateAdaptiveSelector
+
+
+SUMMARY_ARTIFACT_V2 = "phase5_final_evaluation_v2.json"
+PREDICTIONS_ARTIFACT_V2 = "phase5_window_predictions_v2.csv"
 
 
 def compute_metrics(y_true: list[int], y_pred: list[int]) -> dict[str, float]:
@@ -52,13 +59,121 @@ def compute_metrics(y_true: list[int], y_pred: list[int]) -> dict[str, float]:
     }
 
 
-def compute_freq_mae(records: list[dict], freq_ests: list[float | None]) -> float:
-    errors = []
-    for r, f_est in zip(records, freq_ests):
-        if r["target_frequency_hz"] != "" and f_est is not None:
-            target = float(r["target_frequency_hz"])
-            errors.append(abs(float(f_est) - target))
-    return float(np.mean(errors)) if errors else 0.0
+def compute_frequency_metrics(
+    records: list[dict], freq_ests: list[float | None]
+) -> dict[str, float | int | None]:
+    """Compute MAE over target-defined windows and reject missing eligible estimates.
+
+    A blank/None target means frequency MAE is legitimately ineligible (multi-tone
+    or transient cases). A missing estimate on a target-defined window is an
+    evaluation integrity error and must not silently shrink the MAE denominator.
+    """
+    if len(records) != len(freq_ests):
+        raise ValueError(
+            "Frequency predictions must align one-to-one with records: "
+            f"{len(freq_ests)} predictions for {len(records)} records"
+        )
+
+    eligible = [
+        (record, estimate)
+        for record, estimate in zip(records, freq_ests)
+        if record.get("target_frequency_hz") not in (None, "")
+    ]
+    errors: list[float] = []
+    missing_count = 0
+    for record, estimate in eligible:
+        if estimate is None or not np.isfinite(float(estimate)):
+            missing_count += 1
+            continue
+        target = float(record["target_frequency_hz"])
+        errors.append(abs(float(estimate) - target))
+
+    if missing_count:
+        raise ValueError(
+            "Frequency MAE has missing/non-finite predictions for "
+            f"{missing_count} of {len(eligible)} eligible windows; "
+            "refusing to report a potentially biased MAE"
+        )
+
+    return {
+        "mae_hz": float(np.mean(errors)) if errors else None,
+        "eligible_count": len(eligible),
+        "scored_count": len(errors),
+        "missing_prediction_count": missing_count,
+    }
+
+
+def collect_run_provenance(project_root: Path | None = None) -> dict:
+    """Capture best-effort local code/environment provenance without network access."""
+    root = project_root or Path(__file__).resolve().parents[1]
+    revision: str | None = None
+    revision_status = "unavailable"
+    revision_error: str | None = None
+    dirty: bool | None = None
+    dirty_status = "unavailable"
+    dirty_error: str | None = None
+
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True,
+            text=True, check=True, timeout=3,
+        )
+        revision = result.stdout.strip() or None
+        revision_status = "available" if revision else "unavailable"
+        if revision is None:
+            revision_error = "git rev-parse returned an empty revision"
+    except (OSError, subprocess.SubprocessError) as exc:
+        revision_error = f"{type(exc).__name__}: {exc}"
+
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=normal"],
+            cwd=root, capture_output=True, text=True, check=True, timeout=3,
+        )
+        dirty = bool(result.stdout.strip())
+        dirty_status = "available"
+    except (OSError, subprocess.SubprocessError) as exc:
+        dirty_error = f"{type(exc).__name__}: {exc}"
+
+    try:
+        python_environment = {
+            "status": "available",
+            "python_version": platform.python_version(),
+            "implementation": sys.implementation.name,
+            "platform": platform.platform(),
+            "numpy_version": np.__version__,
+            "error": None,
+        }
+    except Exception as exc:  # best-effort provenance must not invent missing values
+        python_environment = {
+            "status": "unavailable",
+            "python_version": None,
+            "implementation": None,
+            "platform": None,
+            "numpy_version": None,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+    return {
+        "git_revision": {
+            "commit": revision,
+            "status": revision_status,
+            "error": revision_error,
+        },
+        "git_working_tree": {
+            "dirty": dirty,
+            "status": dirty_status,
+            "error": dirty_error,
+        },
+        "python_environment": python_environment,
+    }
+
+
+def assert_disjoint_source_group_splits(records: list[dict]) -> None:
+    """Guard the evaluation runner against development/test group leakage."""
+    from generate_signals import assert_disjoint_source_group_splits as check_splits
+
+    check_splits(records)
 
 
 def run_group_bootstrap(
@@ -92,7 +207,9 @@ def run_group_bootstrap(
             ffts = [p["fft_used"] for p in preds_m]
 
             m_metrics = compute_metrics(y_true, yp)
-            fmae = compute_freq_mae(boot_recs, freqs)
+            fmae = compute_frequency_metrics(boot_recs, freqs)["mae_hz"]
+            if fmae is None:
+                raise ValueError("Bootstrap replicate contains no frequency-eligible windows")
 
             boot_stats[m]["f1"].append(m_metrics["f1"])
             boot_stats[m]["recall"].append(m_metrics["recall"])
@@ -117,11 +234,21 @@ def run_group_bootstrap(
 def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    summary_path = out_dir / SUMMARY_ARTIFACT_V2
+    predictions_path = out_dir / PREDICTIONS_ARTIFACT_V2
+    existing_outputs = [path.name for path in (summary_path, predictions_path) if path.exists()]
+    if existing_outputs:
+        raise FileExistsError(
+            "Refusing to overwrite versioned future-run artifacts: "
+            + ", ".join(existing_outputs)
+        )
+
     print("Building full dataset (80 source groups)...")
     records, signals = build_dataset(groups=80, config=DEFAULT_CONFIG, dev_calibration_fraction=0.5)
 
     dev_records = [r for r in records if r["split"] == "development"]
     test_records = [r for r in records if r["split"] == "test"]
+    assert_disjoint_source_group_splits(records)
     assert len(dev_records) == 960
     assert len(test_records) == 320
 
@@ -201,7 +328,6 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
             "stage": "stage1_low",
             "fft_used": False,
             "ops": 10265,
-            "runtime_s": 0.0,  # standalone low
             "reason": "none",
         })
 
@@ -212,7 +338,6 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
             "stage": "stage2_high",
             "fft_used": True,
             "ops": 29250,
-            "runtime_s": 0.0,  # standalone high
             "reason": "none",
         })
 
@@ -223,7 +348,6 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
             "stage": res_v10.stage_reached,
             "fft_used": res_v10.fft_used,
             "ops": res_v10.op_count_proxy,
-            "runtime_s": res_v10.execution_time_s,
             "reason": res_v10.escalation_reason,
         })
 
@@ -234,7 +358,6 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
             "stage": res_v11.stage_reached,
             "fft_used": res_v11.fft_used,
             "ops": res_v11.op_count_proxy,
-            "runtime_s": res_v11.execution_time_s,
             "reason": res_v11.escalation_reason,
         })
 
@@ -248,6 +371,7 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
             "low_freq_hz": res_l.frequency_estimate_hz,
             "high_pred": res_h.predicted_label,
             "high_freq_hz": res_h.frequency_estimate_hz,
+            "v10_freq_hz": res_v10.frequency_estimate_hz,
             "v10_pred": res_v10.predicted_label,
             "v10_stage": res_v10.stage_reached,
             "v10_fft": res_v10.fft_used,
@@ -258,22 +382,29 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
             "v11_fft": res_v11.fft_used,
             "v11_reason": res_v11.escalation_reason,
             "v11_ops": res_v11.op_count_proxy,
-            "v11_runtime_ms": res_v11.execution_time_s * 1000.0,
+            "v11_freq_hz": res_v11.frequency_estimate_hz,
         })
 
-    # Save detailed per-window predictions
-    with (out_dir / "phase5_window_predictions.csv").open("w", newline="", encoding="utf-8") as f:
+    # New schema is written to distinct v2 filenames; historical artifacts are read-only.
+    with predictions_path.open("x", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(test_predictions_table[0].keys()))
         writer.writeheader()
         writer.writerows(test_predictions_table)
 
     # Compute overall metrics
     evaluation_summary = {
+        "artifact_schema_version": "2.0",
         "status": "PHASE5_TEST_EVALUATION_COMPLETE",
         "protocol_version": "1.1.0",
         "test_windows": len(test_records),
         "test_groups": len(set(r["group_id"] for r in test_records)),
         "test_split_hash_sha256": test_hash,
+        "provenance": collect_run_provenance(),
+        "prediction_artifact": PREDICTIONS_ARTIFACT_V2,
+        "runtime_measurement": {
+            "status": "NOT_MEASURED_IN_FROZEN_PHASE5_EVALUATION",
+            "note": "Use results/benchmark_fair_evaluation.json for desktop runtime, where all four methods use the same warmup and repeated timing harness.",
+        },
         "methods": {},
     }
 
@@ -286,14 +417,13 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
         freqs = [p["freq"] for p in predictions[m]]
         ops_list = [p["ops"] for p in predictions[m]]
         fft_list = [p["fft_used"] for p in predictions[m]]
-        runtimes = [p["runtime_s"] for p in predictions[m]]
 
         m_metrics = compute_metrics(y_true, yp)
-        fmae = compute_freq_mae(test_records, freqs)
+        frequency_metrics = compute_frequency_metrics(test_records, freqs)
+        fmae = frequency_metrics["mae_hz"]
         avg_ops = float(np.mean(ops_list))
         esc_rate = float(np.mean(fft_list))
         savings = (29250.0 - avg_ops) / 29250.0 * 100.0
-        avg_runtime_ms = float(np.mean(runtimes)) * 1000.0 if runtimes else 0.0
 
         # Performance by case
         by_case = {}
@@ -334,10 +464,14 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
         evaluation_summary["methods"][m] = {
             "metrics": m_metrics,
             "freq_mae_hz": fmae,
+            "frequency_metric_counts": {
+                "eligible_count": frequency_metrics["eligible_count"],
+                "scored_count": frequency_metrics["scored_count"],
+                "missing_prediction_count": frequency_metrics["missing_prediction_count"],
+            },
             "avg_op_count_proxy": avg_ops,
             "escalation_rate": esc_rate,
             "savings_vs_fixed_high_percent": savings,
-            "avg_runtime_ms": avg_runtime_ms,
             "by_case": by_case,
             "by_snr": by_snr,
         }
@@ -354,7 +488,7 @@ def run_phase5_evaluation(out_dir: Path = Path("results")) -> dict:
         ci = boot_ci[m]
         print(f"{m:<18}: F1=[{ci['f1'][0]:.4f}, {ci['f1'][1]:.4f}], Rec=[{ci['recall'][0]:.4f}, {ci['recall'][1]:.4f}], FAR=[{ci['false_alarm_rate'][0]:.4f}, {ci['false_alarm_rate'][1]:.4f}], Ops=[{ci['avg_ops'][0]:.1f}, {ci['avg_ops'][1]:.1f}]")
 
-    with (out_dir / "phase5_final_evaluation.json").open("w", encoding="utf-8") as f:
+    with summary_path.open("x", encoding="utf-8") as f:
         json.dump(evaluation_summary, f, indent=2)
 
     return evaluation_summary
